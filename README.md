@@ -567,8 +567,8 @@ Student Program Breakdown:
 ---
 
 ## 23. Demonstration Video Link
-- **Screen Recording (3 Minutes):** `[Link to screen recording / YouTube / Google Drive]` *(Awaiting recording)*
-- *Walkthrough checklist for video:* Student application &rarr; Warden approval &rarr; QR pass generation &rarr; Guard exit confirmation &rarr; Guard entry confirmation &rarr; Late alert demonstration.
+- **Screen Recording (3 Minutes):** [Watch GatePass 3-Minute Walkthrough on Google Drive](https://drive.google.com/file/d/1yzee7QsxjZJF9Yv3RzUcdVJ_dkwAE__F/view?usp=sharing)
+- *Walkthrough highlights:* Student application &rarr; Warden approval &rarr; QR pass generation &rarr; Guard exit confirmation at Gate 1 &rarr; Guard entry confirmation at Gate 3 &rarr; Warden analytics & curfew alert audit.
 
 ---
 
@@ -600,8 +600,8 @@ All student names, roll numbers, room assignments, warden credentials, and movem
 | Conversation with real person & 3 quotes | Fieldwork | **Completed** | Guard R. K. Mishra interview in `fieldwork.md` |
 | 1 surprising observation | Fieldwork | **Completed** | Informal WhatsApp coordination in `fieldwork.md` |
 | 20 self-collected real data entries | Fieldwork | **Completed** | 20 real observation rows in `fieldwork.md` |
-| Half-page personal reflection | Reflection | **Drafted** | Personal engineering reflection in `reflection.md` |
-| Screen recording (3 mins) | Submission | **Action Required** | Record 3-min walkthrough & paste link in Section 23 |
+| Half-page personal reflection | Reflection | **Completed** | Personal engineering reflection in `reflection.md` |
+| Screen recording (3 mins) | Submission | **Completed** | [Watch Demo on Google Drive](https://drive.google.com/file/d/1yzee7QsxjZJF9Yv3RzUcdVJ_dkwAE__F/view?usp=sharing) |
 
 ---
 

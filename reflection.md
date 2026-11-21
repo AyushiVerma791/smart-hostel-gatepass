@@ -18,8 +18,7 @@ However, AI wasted time when I asked it about mobile camera scanning: it initial
 ---
 
 **Demonstration Video Link:**  
-*(Video walkthrough recording in progress — link to be pasted upon video upload)*  
-`[Demo Walkthrough URL will be attached here]`
+[GatePass 3-Minute Demonstration Video (Google Drive)](https://drive.google.com/file/d/1yzee7QsxjZJF9Yv3RzUcdVJ_dkwAE__F/view?usp=sharing)
 
 *Author:* Ayushi Verma  
 *Date:* 2026-11-21  
