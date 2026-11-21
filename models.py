@@ -584,9 +584,15 @@ def get_all_movements(search=None, program=None, status_filter=None, date_filter
                (SELECT gate_name FROM gate_logs WHERE outpass_id = o.id AND movement_type = 'ENTRY' LIMIT 1) AS entry_gate
         FROM outpasses o
         JOIN users u ON o.student_id = u.id
-        WHERE o.status IN ('APPROVED', 'OUTSIDE', 'COMPLETED')
+        WHERE 1=1
     """
     params = []
+    if status_filter:
+        query += " AND o.status = ?"
+        params.append(status_filter)
+    else:
+        query += " AND o.status IN ('APPROVED', 'OUTSIDE', 'COMPLETED')"
+
     if search:
         query += " AND (LOWER(u.name) LIKE LOWER(?) OR LOWER(u.roll_number) LIKE LOWER(?) OR LOWER(u.room) LIKE LOWER(?))"
         term = f"%{search.strip()}%"
@@ -594,9 +600,6 @@ def get_all_movements(search=None, program=None, status_filter=None, date_filter
     if program:
         query += " AND u.program = ?"
         params.append(program)
-    if status_filter:
-        query += " AND o.status = ?"
-        params.append(status_filter)
     if date_filter:
         query += " AND o.departure_date = ?"
         params.append(date_filter)
