@@ -53,65 +53,74 @@ def generate_svg_avatar(name, file_path, color_pair):
 
 # -------------------------------------------------------------
 # Fictional Student Roster (52 Synthetic Demo Female Students)
+# Diverse 4-year cohorts (B.Tech: 2022-2025), M.Tech (MRH, MNS, MCL, MSD, MWC, MBI)
+# and PhD (2021-2025)
 # -------------------------------------------------------------
 STUDENT_DATA = [
-    # M.Tech Female Students (12 Students: Information Technology & Bioinformatics)
+    # M.Tech Female Students (12 Students: IT specializations MRH, MNS, MCL, MSD, MWC & Bioinformatics MBI)
     ("Demo Student", "MWC2025014", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-204", "demo.student@campus.ac.in"),
-    ("Pooja Sharma", "MWC2025002", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-205", "pooja.s@campus.ac.in"),
-    ("Sneha Roy", "MWC2025008", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-210", "sneha.r@campus.ac.in"),
-    ("Ananya Sen", "MWC2025019", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-301", "ananya.s@campus.ac.in"),
-    ("Kavita Joshi", "MWC2025023", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-308", "kavita.j@campus.ac.in"),
-    ("Priyanka Das", "MWC2025001", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-201", "priyanka.d@campus.ac.in"),
-    ("Megha Varma", "MWC2025003", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-203", "megha.v@campus.ac.in"),
-    ("Sunidhi Chauhan", "MWC2025005", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-207", "sunidhi.c@campus.ac.in"),
-    ("Ritu Ganguly", "MWC2025009", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-212", "ritu.g@campus.ac.in"),
-    ("Swati Sinha", "MWC2025011", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-304", "swati.s@campus.ac.in"),
-    ("Barkha Rastogi", "MWC2025015", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-307", "barkha.r@campus.ac.in"),
-    ("Chetna Bhardwaj", "MWC2025018", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-311", "chetna.b@campus.ac.in"),
+    ("Pooja Sharma", "MRH2024002", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-205", "pooja.s@campus.ac.in"),
+    ("Sneha Roy", "MNS2024008", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-210", "sneha.r@campus.ac.in"),
+    ("Ananya Sen", "MCL2024005", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-301", "ananya.s@campus.ac.in"),
+    ("Kavita Joshi", "MSD2024011", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-308", "kavita.j@campus.ac.in"),
+    ("Priyanka Das", "MBI2024001", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-201", "priyanka.d@campus.ac.in"),
+    ("Megha Varma", "MRH2025003", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-203", "megha.v@campus.ac.in"),
+    ("Sunidhi Chauhan", "MBI2025005", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-207", "sunidhi.c@campus.ac.in"),
+    ("Ritu Ganguly", "MNS2025009", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-212", "ritu.g@campus.ac.in"),
+    ("Swati Sinha", "MSD2025007", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-304", "swati.s@campus.ac.in"),
+    ("Barkha Rastogi", "MCL2025012", "M.Tech", "Information Technology", "Girls Hostel 3", "GH3-307", "barkha.r@campus.ac.in"),
+    ("Chetna Bhardwaj", "MBI2025018", "M.Tech", "Bioinformatics", "Girls Hostel 3", "GH3-311", "chetna.b@campus.ac.in"),
 
-    # B.Tech Female Students (30 Students: Information Technology & Electrical Engineering)
-    ("Aarohi Verma", "IIT2025001", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-101", "aarohi.v@campus.ac.in"),
-    ("Bhavna Patel", "IIT2025002", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-104", "bhavna.p@campus.ac.in"),
-    ("Charu Gupta", "IIT2025003", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-108", "charu.g@campus.ac.in"),
-    ("Deepika Nair", "IIT2025004", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-202", "deepika.n@campus.ac.in"),
-    ("Esha Mukherjee", "IIT2025005", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-207", "esha.m@campus.ac.in"),
-    ("Gauri Deshmukh", "IIT2025006", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-212", "gauri.d@campus.ac.in"),
-    ("Harini Iyer", "IIT2025007", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-304", "harini.i@campus.ac.in"),
-    ("Ishita Bansal", "IIT2025008", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-309", "ishita.b@campus.ac.in"),
-    ("Jaya Reddy", "IIT2025009", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-315", "jaya.r@campus.ac.in"),
-    ("Kriti Agarwal", "IIT2025010", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-102", "kriti.a@campus.ac.in"),
-    ("Lavanya Menon", "IIT2025011", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-106", "lavanya.m@campus.ac.in"),
-    ("Meera Nambiar", "IIT2025012", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-111", "meera.n@campus.ac.in"),
-    ("Neha Saxena", "IIT2025013", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-201", "neha.s@campus.ac.in"),
-    ("Prachi Kulkarni", "IIT2025014", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-208", "prachi.k@campus.ac.in"),
-    ("Rhea Singhania", "IIT2025015", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-214", "rhea.s@campus.ac.in"),
-    ("Sakshi Mathur", "IIT2025016", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-302", "sakshi.m@campus.ac.in"),
-    ("Tanvi Chauhan", "IIT2025017", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-306", "tanvi.c@campus.ac.in"),
-    ("Urvi Bhatt", "IIT2025018", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-311", "urvi.b@campus.ac.in"),
-    ("Vidya Pillai", "IIT2025019", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-316", "vidya.p@campus.ac.in"),
-    ("Yamini Rao", "IIT2025020", "B.Tech", "Electrical Engineering", "Girls Hostel 3", "GH3-102", "yamini.r@campus.ac.in"),
-    ("Ananya Pandey", "IIT2025021", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-103", "ananya.p@campus.ac.in"),
-    ("Shreya Goswami", "IIT2025022", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-107", "shreya.g@campus.ac.in"),
-    ("Rashi Tripathi", "IIT2025023", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-205", "rashi.t@campus.ac.in"),
-    ("Divya Swaminathan", "IIT2025024", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-209", "divya.s@campus.ac.in"),
-    ("Tanya Mishra", "IIT2025025", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-103", "tanya.m@campus.ac.in"),
-    ("Aditi Srivastava", "IIT2025026", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-108", "aditi.s@campus.ac.in"),
-    ("Radhika Chopra", "IIT2025027", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-204", "radhika.c@campus.ac.in"),
-    ("Simran Kaur", "IIT2025028", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-211", "simran.k@campus.ac.in"),
+    # B.Tech Female Students (30 Students: 4 cohorts across 2022, 2023, 2024, 2025 in IT & Electrical)
+    # 4th Year (Batch 2022)
+    ("Aarohi Verma", "IIT2022001", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-101", "aarohi.v@campus.ac.in"),
+    ("Bhavna Patel", "IEC2022004", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-104", "bhavna.p@campus.ac.in"),
+    ("Charu Gupta", "IIT2022015", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-108", "charu.g@campus.ac.in"),
+    ("Deepika Nair", "IEC2022018", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-202", "deepika.n@campus.ac.in"),
+    ("Esha Mukherjee", "IIT2022023", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-207", "esha.m@campus.ac.in"),
+    ("Gauri Deshmukh", "IEC2022029", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-212", "gauri.d@campus.ac.in"),
+    ("Harini Iyer", "IIT2022034", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-304", "harini.i@campus.ac.in"),
+
+    # 3rd Year (Batch 2023)
+    ("Ishita Bansal", "IIT2023005", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-309", "ishita.b@campus.ac.in"),
+    ("Jaya Reddy", "IEC2023008", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-315", "jaya.r@campus.ac.in"),
+    ("Kriti Agarwal", "IIT2023014", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-102", "kriti.a@campus.ac.in"),
+    ("Lavanya Menon", "IEC2023019", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-106", "lavanya.m@campus.ac.in"),
+    ("Meera Nambiar", "IIT2023025", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-111", "meera.n@campus.ac.in"),
+    ("Neha Saxena", "IEC2023028", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-201", "neha.s@campus.ac.in"),
+    ("Prachi Kulkarni", "IIT2023032", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-208", "prachi.k@campus.ac.in"),
+
+    # 2nd Year (Batch 2024)
+    ("Rhea Singhania", "IIT2024009", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-214", "rhea.s@campus.ac.in"),
+    ("Sakshi Mathur", "IEC2024003", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-302", "sakshi.m@campus.ac.in"),
+    ("Tanvi Chauhan", "IIT2024016", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-306", "tanvi.c@campus.ac.in"),
+    ("Urvi Bhatt", "IEC2024021", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-311", "urvi.b@campus.ac.in"),
+    ("Vidya Pillai", "IIT2024028", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-316", "vidya.p@campus.ac.in"),
+    ("Yamini Rao", "IEC2024035", "B.Tech", "Electrical Engineering", "Girls Hostel 3", "GH3-102", "yamini.r@campus.ac.in"),
+    ("Ananya Pandey", "IIT2024041", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-103", "ananya.p@campus.ac.in"),
+    ("Shreya Goswami", "IEC2024047", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-107", "shreya.g@campus.ac.in"),
+
+    # 1st Year (Batch 2025)
+    ("Rashi Tripathi", "IIT2025002", "B.Tech", "Information Technology", "Girls Hostel 1", "GH1-205", "rashi.t@campus.ac.in"),
+    ("Divya Swaminathan", "IEC2025006", "B.Tech", "Electrical Engineering", "Girls Hostel 1", "GH1-209", "divya.s@campus.ac.in"),
+    ("Tanya Mishra", "IIT2025011", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-103", "tanya.m@campus.ac.in"),
+    ("Aditi Srivastava", "IEC2025017", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-108", "aditi.s@campus.ac.in"),
+    ("Radhika Chopra", "IIT2025022", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-204", "radhika.c@campus.ac.in"),
+    ("Simran Kaur", "IEC2025026", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-211", "simran.k@campus.ac.in"),
     ("Nandini Sen", "IIT2025029", "B.Tech", "Information Technology", "Girls Hostel 2", "GH2-305", "nandini.s@campus.ac.in"),
-    ("Pallavi Joshi", "IIT2025030", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-314", "pallavi.j@campus.ac.in"),
+    ("Pallavi Joshi", "IEC2025030", "B.Tech", "Electrical Engineering", "Girls Hostel 2", "GH2-314", "pallavi.j@campus.ac.in"),
 
-    # PhD Female Scholars (10 Scholars: Information Technology)
-    ("Dr. Arundhati Ghosh", "PHD2025001", "PhD", "Information Technology", "Girls Hostel 3", "GH3-401", "arundhati.phd@campus.ac.in"),
-    ("Bipasha Das", "PHD2025002", "PhD", "Information Technology", "Girls Hostel 3", "GH3-403", "bipasha.phd@campus.ac.in"),
-    ("Chitrangada Sen", "PHD2025003", "PhD", "Information Technology", "Girls Hostel 3", "GH3-406", "chitra.phd@campus.ac.in"),
-    ("Devika Swaminathan", "PHD2025004", "PhD", "Information Technology", "Girls Hostel 3", "GH3-409", "devika.phd@campus.ac.in"),
-    ("Farida Sheikh", "PHD2025005", "PhD", "Information Technology", "Girls Hostel 3", "GH3-412", "farida.phd@campus.ac.in"),
-    ("Garima Bhatia", "PHD2025006", "PhD", "Information Technology", "Girls Hostel 3", "GH3-415", "garima.phd@campus.ac.in"),
-    ("Himani Chadha", "PHD2025007", "PhD", "Information Technology", "Girls Hostel 3", "GH3-418", "himani.phd@campus.ac.in"),
-    ("Jasleen Arora", "PHD2025008", "PhD", "Information Technology", "Girls Hostel 3", "GH3-420", "jasleen.phd@campus.ac.in"),
-    ("Komal Waghmare", "PHD2025009", "PhD", "Information Technology", "Girls Hostel 3", "GH3-422", "komal.phd@campus.ac.in"),
-    ("Leela Venkatesh", "PHD2025010", "PhD", "Information Technology", "Girls Hostel 3", "GH3-425", "leela.phd@campus.ac.in"),
+    # PhD Female Scholars (10 Scholars: Batches 2021-2025 in Information Technology)
+    ("Dr. Arundhati Ghosh", "PHD2021001", "PhD", "Information Technology", "Girls Hostel 3", "GH3-401", "arundhati.phd@campus.ac.in"),
+    ("Bipasha Das", "PHD2021004", "PhD", "Information Technology", "Girls Hostel 3", "GH3-403", "bipasha.phd@campus.ac.in"),
+    ("Chitrangada Sen", "PHD2022002", "PhD", "Information Technology", "Girls Hostel 3", "GH3-406", "chitra.phd@campus.ac.in"),
+    ("Devika Swaminathan", "PHD2022005", "PhD", "Information Technology", "Girls Hostel 3", "GH3-409", "devika.phd@campus.ac.in"),
+    ("Farida Sheikh", "PHD2023003", "PhD", "Information Technology", "Girls Hostel 3", "GH3-412", "farida.phd@campus.ac.in"),
+    ("Garima Bhatia", "PHD2023007", "PhD", "Information Technology", "Girls Hostel 3", "GH3-415", "garima.phd@campus.ac.in"),
+    ("Himani Chadha", "PHD2024001", "PhD", "Information Technology", "Girls Hostel 3", "GH3-418", "himani.phd@campus.ac.in"),
+    ("Jasleen Arora", "PHD2024006", "PhD", "Information Technology", "Girls Hostel 3", "GH3-420", "jasleen.phd@campus.ac.in"),
+    ("Komal Waghmare", "PHD2025002", "PhD", "Information Technology", "Girls Hostel 3", "GH3-422", "komal.phd@campus.ac.in"),
+    ("Leela Venkatesh", "PHD2025005", "PhD", "Information Technology", "Girls Hostel 3", "GH3-425", "leela.phd@campus.ac.in"),
 ]
 
 GUARD_ACCOUNTS = [
