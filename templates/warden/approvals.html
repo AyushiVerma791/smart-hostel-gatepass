@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Approvals — GatePass Warden{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-12 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">Outpass Approval Inbox</h4>
+      <p class="text-muted small mb-0">Review, verify student details, and authorize digital QR gate passes</p>
+    </div>
+    <span class="badge bg-warning text-dark px-3 py-2 fs-6">
+      <i class="bi bi-inbox me-1"></i> {{ pending_list | length }} Pending
+    </span>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="col-12">
+    <div class="card card-gp p-3">
+      <form method="GET" action="{{ url_for('warden_approvals') }}" class="row g-2 align-items-center">
+        <div class="col-12 col-md-5">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Search by student name, roll number, or room...">
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <select class="form-select form-select-sm" name="program">
+            <option value="">All Programs</option>
+            <option value="B.Tech" {% if program == 'B.Tech' %}selected{% endif %}>B.Tech</option>
+            <option value="M.Tech" {% if program == 'M.Tech' %}selected{% endif %}>M.Tech</option>
+            <option value="PhD" {% if program == 'PhD' %}selected{% endif %}>PhD</option>
+          </select>
+        </div>
+
+        <div class="col-6 col-md-4 d-flex gap-2">
+          <button type="submit" class="btn btn-navy btn-sm flex-grow-1">Filter</button>
+          <a href="{{ url_for('warden_approvals') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Approvals List -->
+  <div class="col-12">
+    <div class="card card-gp">
+      <div class="table-responsive">
+        <table class="table table-gp table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Pass Code</th>
+              <th>Student Details</th>
+              <th>Hostel & Room</th>
+              <th>Destination & Purpose</th>
+              <th>Departure Schedule</th>
+              <th>Expected Return</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if pending_list %}
+              {% for p in pending_list %}
+                <tr>
+                  <td>
+                    <span class="fw-bold text-navy">#{{ p.pass_code }}</span>
+                    <div class="small text-muted">{{ p.created_at | ist_date }}</div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      {% if p.avatar %}
+                        <img src="{{ url_for('static', filename=p.avatar) }}" width="38" height="38" class="rounded-circle bg-white border" alt="Avatar">
+                      {% endif %}
+                      <div>
+                        <div class="fw-bold text-dark">{{ p.student_name }}</div>
+                        <div class="small text-muted font-monospace">{{ p.roll_number }} &bull; {{ p.program }}</div>
+                        <div class="small text-secondary" style="font-size: 0.75rem;">{{ p.department }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="small fw-semibold text-dark">{{ p.hostel }}</div>
+                    <div class="small text-muted">Room: {{ p.room }}</div>
+                  </td>
+                  <td>
+                    <div class="fw-semibold text-dark">{{ p.destination }}</div>
+                    <div class="small text-muted text-truncate" style="max-width: 200px;">{{ p.purpose }}</div>
+                  </td>
+                  <td>
+                    <div class="small fw-semibold">{{ p.departure_date }}</div>
+                    <div class="small text-muted">{{ p.planned_exit_datetime | time_only }}</div>
+                  </td>
+                  <td>
+                    <div class="small fw-semibold">{{ p.expected_return_datetime | time_only }}</div>
+                    <div class="small text-danger fw-semibold" style="font-size: 0.72rem;">Curfew: 10:00 PM</div>
+                  </td>
+                  <td class="text-end">
+                    <div class="d-inline-flex gap-1">
+                      <!-- Approve Button -->
+                      <form method="POST" action="{{ url_for('warden_approve_action', outpass_id=p.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-sm btn-success" title="Approve & Generate QR Pass">
+                          <i class="bi bi-check-lg me-1"></i> Approve
+                        </button>
+                      </form>
+
+                      <!-- Reject Button (Modal Trigger) -->
+                      <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ p.id }}" title="Reject Request">
+                        <i class="bi bi-x-lg me-1"></i> Reject
+                      </button>
+                    </div>
+
+                    <!-- Rejection Modal -->
+                    <div class="modal fade" id="rejectModal{{ p.id }}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content text-start">
+                          <form method="POST" action="{{ url_for('warden_reject_action', outpass_id=p.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <div class="modal-header">
+                              <h6 class="modal-title fw-bold text-danger">
+                                <i class="bi bi-x-circle me-1"></i> Decline Outpass #{{ p.pass_code }}
+                              </h6>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="alert alert-light border small mb-3">
+                                <strong>Student:</strong> {{ p.student_name }} ({{ p.roll_number }}) &bull; Room {{ p.room }}<br>
+                                <strong>Destination:</strong> {{ p.destination }}
+                              </div>
+                              <label class="form-label small fw-semibold text-secondary">
+                                Reason for Rejection <span class="text-danger">*</span>
+                              </label>
+                              <textarea class="form-control" name="reason" rows="3" required placeholder="Specify institutional reason (e.g. curfew violation, pending parental consent)"></textarea>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                              <button type="submit" class="btn btn-sm btn-danger">Confirm Rejection</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">
+                  <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                  No pending outpass requests matching your criteria.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

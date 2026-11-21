@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Warden Dashboard — GatePass{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <!-- Header Title -->
+  <div class="col-12 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">Chief Warden Command Console</h4>
+      <p class="text-muted small mb-0">Live monitoring of hostel outpass approvals, active departures, and late returns</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('warden_approvals') }}" class="btn btn-warning fw-semibold shadow-sm">
+        <i class="bi bi-hourglass-split me-1"></i> Review Pending ({{ kpis.pending_count }})
+      </a>
+      <a href="{{ url_for('warden_movements') }}" class="btn btn-navy shadow-sm">
+        <i class="bi bi-door-open me-1"></i> Movement Log
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Overview Cards -->
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card border-start border-4 border-warning">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Pending Approvals</div>
+        <h3 class="fw-bold mb-0 mt-1 text-warning">{{ kpis.pending_count }}</h3>
+        <span class="small text-muted">Awaiting decision</span>
+      </div>
+      <div class="kpi-icon bg-warning-subtle text-warning">
+        <i class="bi bi-inbox-fill"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card border-start border-4 border-success">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Active Approved Passes</div>
+        <h3 class="fw-bold mb-0 mt-1 text-success">{{ kpis.approved_count }}</h3>
+        <span class="small text-muted">Ready to leave</span>
+      </div>
+      <div class="kpi-icon bg-success-subtle text-success">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card border-start border-4 border-info">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Currently Outside</div>
+        <h3 class="fw-bold mb-0 mt-1 text-primary">{{ kpis.outside_count }}</h3>
+        <span class="small text-muted">Off campus right now</span>
+      </div>
+      <div class="kpi-icon bg-info-subtle text-primary">
+        <i class="bi bi-person-walking"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card border-start border-4 border-danger">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Late / Overdue Incidents</div>
+        <h3 class="fw-bold mb-0 mt-1 text-danger">{{ kpis.total_late_incidents }}</h3>
+        <span class="small text-danger fw-semibold">{{ kpis.overdue_outside_count }} overdue now</span>
+      </div>
+      <div class="kpi-icon bg-danger-subtle text-danger">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Section 1: Students Currently Outside Campus -->
+  <div class="col-12 col-xl-7">
+    <div class="card card-gp h-100">
+      <div class="card-gp-header">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-purple text-white p-2 rounded-circle" style="background-color: var(--status-outside);">
+            <i class="bi bi-geo-alt-fill"></i>
+          </span>
+          <div>
+            <h5 class="fw-bold mb-0">Students Currently Outside</h5>
+            <span class="text-muted small">Live roster of students who passed gate exit and have not returned</span>
+          </div>
+        </div>
+        <span class="badge bg-light text-dark border">{{ kpis.outside_count }} outside</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-gp table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Hostel / Room</th>
+              <th>Exit Gate & Time</th>
+              <th>Expected Return</th>
+              <th>Status Alert</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if kpis.outside_students %}
+              {% for s in kpis.outside_students %}
+                <tr class="{% if s.is_late %}table-danger{% endif %}">
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      {% if s.avatar %}
+                        <img src="{{ url_for('static', filename=s.avatar) }}" width="36" height="36" class="rounded-circle bg-white border" alt="Avatar">
+                      {% endif %}
+                      <div>
+                        <div class="fw-bold text-dark">{{ s.student_name }}</div>
+                        <div class="small text-muted font-monospace">{{ s.roll_number }} &bull; {{ s.program }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="small fw-semibold text-secondary">{{ s.room }}</div>
+                    <div class="small text-muted text-truncate" style="max-width: 130px;">{{ s.destination }}</div>
+                  </td>
+                  <td>
+                    <div class="small fw-bold text-danger">
+                      <i class="bi bi-arrow-up-right me-1"></i>{{ s.exit_gate }}
+                    </div>
+                    <div class="small text-muted">{{ s.exit_time | time_only }}</div>
+                  </td>
+                  <td>
+                    <div class="small fw-bold">{{ s.expected_return_datetime | time_only }}</div>
+                    <div class="small text-muted">Curfew: 10 PM</div>
+                  </td>
+                  <td>
+                    {% if s.is_late %}
+                      <span class="badge bg-danger small animate__animated animate__pulse animate__infinite">
+                        <i class="bi bi-alarm-fill me-1"></i> OVERDUE ({{ s.minutes_late }}m)
+                      </span>
+                    {% else %}
+                      <span class="badge bg-info text-dark small">
+                        <i class="bi bi-hourglass-split me-1"></i> Within Time
+                      </span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-center py-4 text-muted">
+                  <i class="bi bi-shield-check fs-2 text-success d-block mb-1"></i>
+                  All approved students are currently inside the hostel premises.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Urgent Pending Approvals -->
+  <div class="col-12 col-xl-5">
+    <div class="card card-gp h-100">
+      <div class="card-gp-header">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-warning text-dark p-2 rounded-circle">
+            <i class="bi bi-bell-fill"></i>
+          </span>
+          <div>
+            <h5 class="fw-bold mb-0">Incoming Requests</h5>
+            <span class="text-muted small">Applications waiting for approval</span>
+          </div>
+        </div>
+        <a href="{{ url_for('warden_approvals') }}" class="btn btn-sm btn-outline-warning text-dark">
+          View All ({{ kpis.pending_count }})
+        </a>
+      </div>
+
+      <div class="card-body p-0">
+        {% if pending_requests %}
+          <div class="list-group list-group-flush">
+            {% for req in pending_requests %}
+              <div class="list-group-item p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    {% if req.avatar %}
+                      <img src="{{ url_for('static', filename=req.avatar) }}" width="36" height="36" class="rounded-circle bg-white border" alt="Avatar">
+                    {% endif %}
+                    <div>
+                      <div class="fw-bold text-dark">{{ req.student_name }}</div>
+                      <div class="small text-muted font-monospace">{{ req.roll_number }} &bull; {{ req.room }}</div>
+                    </div>
+                  </div>
+                  <span class="badge bg-light text-navy border">#{{ req.pass_code }}</span>
+                </div>
+
+                <div class="bg-light p-2 rounded-2 small mb-2 border">
+                  <div><strong>Destination:</strong> {{ req.destination }}</div>
+                  <div><strong>Schedule:</strong> {{ req.departure_time }} &rarr; {{ req.expected_return_datetime | time_only }}</div>
+                  <div class="text-muted text-truncate"><strong>Purpose:</strong> {{ req.purpose }}</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                  <!-- Reject Button (Modal Trigger) -->
+                  <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ req.id }}">
+                    <i class="bi bi-x-circle me-1"></i> Reject
+                  </button>
+                  <!-- Approve Form -->
+                  <form method="POST" action="{{ url_for('warden_approve_action', outpass_id=req.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="btn btn-sm btn-success">
+                      <i class="bi bi-check-circle me-1"></i> Approve
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Rejection Reason Modal -->
+              <div class="modal fade" id="rejectModal{{ req.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <form method="POST" action="{{ url_for('warden_reject_action', outpass_id=req.id) }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                      <div class="modal-header">
+                        <h6 class="modal-title fw-bold text-danger">
+                          <i class="bi bi-x-circle me-1"></i> Reject Outpass #{{ req.pass_code }}
+                        </h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p class="small text-secondary mb-2">
+                          Specify a reason for declining <strong>{{ req.student_name }}'s</strong> request. This will be visible to the student in their portal.
+                        </p>
+                        <div class="mb-3">
+                          <label class="form-label small fw-semibold">Rejection Remark:</label>
+                          <textarea class="form-control" name="reason" rows="3" required placeholder="e.g. Return time exceeds night curfew policy or parental verification required."></textarea>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-danger">Confirm Rejection</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-check-all fs-2 text-success d-block mb-1"></i>
+            No pending outpass requests. You are all caught up!
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

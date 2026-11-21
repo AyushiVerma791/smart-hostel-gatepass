@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Enrolled Female Students Directory — GatePass Warden{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-12 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">Hostel Student Master Directory</h4>
+      <p class="text-muted small mb-0">Complete roster of enrolled female residents across all campus hostels</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-navy text-white px-3 py-2 fs-6">
+        <i class="bi bi-people-fill me-1"></i> {{ students | length }} Enrolled Students
+      </span>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="col-12">
+    <div class="card card-gp p-3">
+      <form method="GET" action="{{ url_for('warden_students') }}" class="row g-2 align-items-center">
+        <div class="col-12 col-md-5">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Search by student name, roll number, or room...">
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <select class="form-select form-select-sm" name="program">
+            <option value="">All Academic Programs</option>
+            <option value="B.Tech" {% if program == 'B.Tech' %}selected{% endif %}>B.Tech (30 Students)</option>
+            <option value="M.Tech" {% if program == 'M.Tech' %}selected{% endif %}>M.Tech (12 Students)</option>
+            <option value="PhD" {% if program == 'PhD' %}selected{% endif %}>PhD Scholars (10 Students)</option>
+          </select>
+        </div>
+
+        <div class="col-6 col-md-4 d-flex gap-2">
+          <button type="submit" class="btn btn-navy btn-sm flex-grow-1">Filter Roster</button>
+          <a href="{{ url_for('warden_students') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Master Student Roster Table -->
+  <div class="col-12">
+    <div class="card card-gp">
+      <div class="table-responsive">
+        <table class="table table-gp table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student Identity</th>
+              <th>Roll Number</th>
+              <th>Program & Department</th>
+              <th>Hostel & Room</th>
+              <th>Institutional Email</th>
+              <th>Outpass Activity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if students %}
+              {% for s in students %}
+                <tr>
+                  <td class="text-muted small">{{ loop.index }}</td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      {% if s.avatar %}
+                        <img src="{{ url_for('static', filename=s.avatar) }}" width="36" height="36" class="rounded-circle bg-white border" alt="Avatar">
+                      {% endif %}
+                      <div>
+                        <div class="fw-bold text-dark">{{ s.name }}</div>
+                        <span class="badge {% if s.program == 'B.Tech' %}bg-primary-subtle text-primary{% elif s.program == 'M.Tech' %}bg-info-subtle text-info-emphasis{% else %}bg-purple-subtle text-purple{% endif %} small" style="font-size: 0.68rem;">
+                          {{ s.program }}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-navy border font-monospace fs-6">{{ s.roll_number }}</span>
+                  </td>
+                  <td>
+                    <div class="small fw-semibold text-dark">{{ s.department }}</div>
+                  </td>
+                  <td>
+                    <div class="small fw-bold text-navy"><i class="bi bi-building me-1"></i>{{ s.hostel }}</div>
+                    <div class="small text-muted">Room: <strong>{{ s.room }}</strong></div>
+                  </td>
+                  <td>
+                    <span class="small text-muted font-monospace">{{ s.email or '-' }}</span>
+                  </td>
+                  <td>
+                    {% if s.total_outpasses and s.total_outpasses > 0 %}
+                      <span class="badge bg-success-subtle text-success border border-success-subtle">
+                        {{ s.total_outpasses }} Outpasses
+                      </span>
+                      {% if s.latest_status %}
+                        <div class="small mt-1">
+                          Latest: <span class="badge-status {{ s.latest_status.lower() }}" style="font-size: 0.65rem;">{{ s.latest_status }}</span>
+                        </div>
+                      {% endif %}
+                    {% else %}
+                      <span class="text-muted small">No outpasses yet</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">
+                  <i class="bi bi-search fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                  No students found matching your search.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

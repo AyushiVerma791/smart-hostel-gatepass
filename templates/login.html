@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In — GatePass Outpass Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-12 col-md-9 col-lg-6">
+    
+    <div class="card card-gp shadow-lg border-0">
+      <div class="card-header bg-white border-0 text-center pt-4 pb-2">
+        <div class="d-inline-flex align-items-center justify-content-center bg-light text-primary rounded-circle mb-3 p-3 shadow-sm" style="width: 70px; height: 70px;">
+          <i class="bi bi-shield-lock-fill fs-2" style="color: var(--primary-navy);"></i>
+        </div>
+        <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">GatePass Portal</h4>
+        <p class="text-muted small mb-0">Smart Girls' Hostel Outpass & Security Verification System</p>
+      </div>
+
+      <div class="card-body p-4 pt-2">
+        <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+          <div class="mb-3">
+            <label for="roll_number" class="form-label small fw-semibold text-secondary">
+              Roll Number or Username <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light text-muted border-end-0">
+                <i class="bi bi-person"></i>
+              </span>
+              <input type="text" class="form-control border-start-0" id="roll_number" name="roll_number" placeholder="e.g. MWC2025014 or warden" required autofocus>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="password" class="form-label small fw-semibold text-secondary">
+              Password <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light text-muted border-end-0">
+                <i class="bi bi-key"></i>
+              </span>
+              <input type="password" class="form-control border-start-0" id="password" name="password" placeholder="Enter password" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-navy w-100 py-2 fs-6 shadow-sm">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Account
+          </button>
+        </form>
+
+        <hr class="my-4 text-muted">
+
+        <!-- Quick 1-Click Administrative & Featured Accounts -->
+        <div class="demo-accounts-box p-3 rounded-3 bg-light border mb-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="small fw-bold text-navy">
+              <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick 1-Click Role Login:
+            </span>
+            <span class="badge bg-secondary-subtle text-secondary small">Demo Access</span>
+          </div>
+          
+          <div class="row g-2">
+            <!-- Warden -->
+            <div class="col-12">
+              <button type="button" class="btn btn-sm btn-outline-success w-100 text-start d-flex justify-content-between align-items-center p-2 demo-btn" 
+                      data-user="warden" data-pass="warden123">
+                <div>
+                  <span class="fw-bold small"><i class="bi bi-award me-1"></i> Chief Warden (Approvals & Movements)</span>
+                  <div class="text-muted" style="font-size: 0.72rem;">username: warden &bull; pass: warden123</div>
+                </div>
+                <span class="badge bg-success-subtle text-success">Admin</span>
+              </button>
+            </div>
+
+            <!-- Student M.Tech Demo -->
+            <div class="col-6">
+              <button type="button" class="btn btn-sm btn-outline-primary w-100 text-start d-flex flex-column p-2 demo-btn" 
+                      data-user="MWC2025014" data-pass="student123">
+                <span class="fw-bold small"><i class="bi bi-person me-1"></i> Demo Student (M.Tech)</span>
+                <span class="text-muted" style="font-size: 0.72rem;">MWC2025014 &bull; GH3-204</span>
+              </button>
+            </div>
+
+            <!-- Student B.Tech Demo -->
+            <div class="col-6">
+              <button type="button" class="btn btn-sm btn-outline-primary w-100 text-start d-flex flex-column p-2 demo-btn" 
+                      data-user="IIT2025001" data-pass="student123">
+                <span class="fw-bold small"><i class="bi bi-person me-1"></i> Aarohi Verma (B.Tech)</span>
+                <span class="text-muted" style="font-size: 0.72rem;">IIT2025001 &bull; GH1-101</span>
+              </button>
+            </div>
+
+            <!-- 4 Security Gates -->
+            <div class="col-6 col-sm-3">
+              <button type="button" class="btn btn-sm btn-outline-secondary w-100 p-1 text-center demo-btn" 
+                      data-user="guard1" data-pass="guard123" title="Rajesh Kumar (Gate 1)">
+                <span class="fw-semibold small d-block">Gate 1</span>
+                <span class="text-muted" style="font-size: 0.7rem;">guard1</span>
+              </button>
+            </div>
+            <div class="col-6 col-sm-3">
+              <button type="button" class="btn btn-sm btn-outline-secondary w-100 p-1 text-center demo-btn" 
+                      data-user="guard2" data-pass="guard123" title="Vikram Singh (Gate 2)">
+                <span class="fw-semibold small d-block">Gate 2</span>
+                <span class="text-muted" style="font-size: 0.7rem;">guard2</span>
+              </button>
+            </div>
+            <div class="col-6 col-sm-3">
+              <button type="button" class="btn btn-sm btn-outline-secondary w-100 p-1 text-center demo-btn" 
+                      data-user="guard3" data-pass="guard123" title="Manoj Tiwari (Gate 3)">
+                <span class="fw-semibold small d-block">Gate 3</span>
+                <span class="text-muted" style="font-size: 0.7rem;">guard3</span>
+              </button>
+            </div>
+            <div class="col-6 col-sm-3">
+              <button type="button" class="btn btn-sm btn-outline-secondary w-100 p-1 text-center demo-btn" 
+                      data-user="guard4" data-pass="guard123" title="Ramesh Chandra (Gate 4)">
+                <span class="fw-semibold small d-block">Gate 4</span>
+                <span class="text-muted" style="font-size: 0.7rem;">guard4</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 50 Enrolled Female Students Directory Selector -->
+        <div class="p-3 bg-white rounded-3 border">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="small fw-bold text-navy">
+              <i class="bi bi-people-fill text-primary me-1"></i> Enrolled Female Students Directory:
+            </span>
+            <span class="badge bg-primary text-white small">50+ Students in Database</span>
+          </div>
+          <p class="small text-muted mb-2" style="font-size: 0.75rem;">
+            Select any registered female hostel student below to instantly populate their login credentials:
+          </p>
+
+          <div class="input-group input-group-sm mb-2">
+            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="studentSearchInput" placeholder="Filter 50 students by name, roll no, or room...">
+          </div>
+
+          <div class="student-select-list border rounded p-2" id="studentSelectList" style="max-height: 220px; overflow-y: auto;">
+            {% if all_students %}
+              <div class="row g-1">
+                {% for s in all_students %}
+                  <div class="col-12 student-item" data-text="{{ s.name }} {{ s.roll_number }} {{ s.room }} {{ s.program }}">
+                    <button type="button" class="btn btn-sm btn-light border w-100 text-start d-flex align-items-center justify-content-between p-1 px-2 demo-btn"
+                            data-user="{{ s.roll_number }}" data-pass="student123">
+                      <div class="d-flex align-items-center gap-2">
+                        {% if s.avatar %}
+                          <img src="{{ url_for('static', filename=s.avatar) }}" width="24" height="24" class="rounded-circle bg-white" alt="Avatar">
+                        {% endif %}
+                        <div>
+                          <span class="fw-semibold text-dark small">{{ s.name }}</span>
+                          <span class="text-muted font-monospace" style="font-size: 0.72rem;">({{ s.roll_number }})</span>
+                        </div>
+                      </div>
+                      <div class="text-end">
+                        <span class="badge {% if s.program == 'B.Tech' %}bg-primary-subtle text-primary{% elif s.program == 'M.Tech' %}bg-info-subtle text-info-emphasis{% else %}bg-purple-subtle text-purple{% endif %}" style="font-size: 0.65rem;">
+                          {{ s.program }}
+                        </span>
+                        <span class="text-secondary small d-none d-sm-inline" style="font-size: 0.7rem;">{{ s.room }}</span>
+                      </div>
+                    </button>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="text-center py-3 text-muted small">Loading student roster...</div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+      <div class="card-footer bg-light border-0 py-3 text-center small text-muted">
+        <i class="bi bi-info-circle me-1"></i> Fictional prototype accounts for academic/take-home assignment testing.
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const userField = document.getElementById("roll_number");
+  const passField = document.getElementById("password");
+
+  // Delegate click for demo-btn (works for statically and dynamically loaded items)
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".demo-btn");
+    if (btn) {
+      const user = btn.getAttribute("data-user");
+      const pass = btn.getAttribute("data-pass");
+      if (user && pass) {
+        userField.value = user;
+        passField.value = pass;
+        userField.classList.add("is-valid");
+        passField.classList.add("is-valid");
+        userField.focus();
+      }
+    }
+  });
+
+  // Client-side instant filter for the 50 students roster
+  const searchInput = document.getElementById("studentSearchInput");
+  const items = document.querySelectorAll(".student-item");
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      items.forEach(item => {
+        const text = item.getAttribute("data-text").toLowerCase();
+        if (text.includes(query)) {
+          item.style.display = "";
+        } else {
+          item.style.display = "none";
+        }
+      });
+    });
+  }
+});
+</script>
+{% endblock %}

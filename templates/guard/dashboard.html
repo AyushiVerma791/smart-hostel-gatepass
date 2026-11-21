@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Guard Station Console ({{ guard_gate }}) — GatePass{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <!-- Station Header Banner -->
+  <div class="col-12">
+    <div class="card card-gp border-0 p-3 p-md-4 shadow-sm" style="background: linear-gradient(135deg, #0d2b45 0%, #173f5f 100%); color: #ffffff;">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center fw-bold fs-3" style="width: 60px; height: 60px;">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <div>
+            <div class="badge bg-warning text-dark fw-bold px-2 py-1 mb-1">{{ guard_gate }} STATION</div>
+            <h4 class="fw-bold mb-1">{{ current_user.name }}</h4>
+            <div class="small opacity-75">
+              <span>Security Terminal ID: <strong>{{ current_user.roll_number }}</strong></span> &bull; 
+              <span>Status: <strong class="text-success"><i class="bi bi-circle-fill" style="font-size: 0.6rem;"></i> ONLINE & ACTIVE</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <a href="{{ url_for('guard_verify') }}" class="btn btn-warning btn-lg fw-bold px-4 py-2 shadow-sm">
+            <i class="bi bi-qr-code-scan me-2"></i> Launch QR Scanner & Verify
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gate Statistics Cards -->
+  <div class="col-6 col-md-4">
+    <div class="kpi-card border-start border-4 border-danger">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Today's Exits at {{ guard_gate }}</div>
+        <h3 class="fw-bold mb-0 mt-1 text-danger">{{ today_exits }}</h3>
+        <span class="small text-muted">Students departed</span>
+      </div>
+      <div class="kpi-icon bg-danger-subtle text-danger">
+        <i class="bi bi-box-arrow-up-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4">
+    <div class="kpi-card border-start border-4 border-success">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Today's Entries at {{ guard_gate }}</div>
+        <h3 class="fw-bold mb-0 mt-1 text-success">{{ today_entries }}</h3>
+        <span class="small text-muted">Students returned</span>
+      </div>
+      <div class="kpi-icon bg-success-subtle text-success">
+        <i class="bi bi-box-arrow-in-down-left"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-4">
+    <div class="kpi-card border-start border-4 border-primary">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Verification Protocol</div>
+        <div class="fw-bold text-dark mt-1">Photo Match Required</div>
+        <span class="small text-muted">Compare student with displayed photo</span>
+      </div>
+      <div class="kpi-icon bg-primary-subtle text-primary">
+        <i class="bi bi-person-badge"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Gate Verifications Table -->
+<div class="card card-gp">
+  <div class="card-gp-header">
+    <div>
+      <h5 class="fw-bold mb-0">Recent Activity Log ({{ guard_gate }})</h5>
+      <span class="text-muted small">Latest timestamped student departures and returns recorded at this security post</span>
+    </div>
+    <a href="{{ url_for('guard_verify') }}" class="btn btn-navy btn-sm">
+      <i class="bi bi-qr-code-scan me-1"></i> Scan / Verify Student
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-gp table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Student Identity</th>
+          <th>Pass Code</th>
+          <th>Hostel Room</th>
+          <th>Destination</th>
+          <th>Movement Type</th>
+          <th>Timestamp</th>
+          <th>Guard Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if recent_logs %}
+          {% for l in recent_logs %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  {% if l.avatar %}
+                    <img src="{{ url_for('static', filename=l.avatar) }}" width="36" height="36" class="rounded-circle bg-white border" alt="Avatar">
+                  {% endif %}
+                  <div>
+                    <div class="fw-bold text-dark">{{ l.student_name }}</div>
+                    <div class="small text-muted font-monospace">{{ l.roll_number }} &bull; {{ l.program }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-light text-navy border">#{{ l.pass_code }}</span>
+              </td>
+              <td>
+                <span class="small fw-semibold">{{ l.room }}</span>
+              </td>
+              <td>
+                <span class="small text-muted text-truncate d-inline-block" style="max-width: 150px;">{{ l.destination }}</span>
+              </td>
+              <td>
+                {% if l.movement_type == 'EXIT' %}
+                  <span class="badge bg-danger text-white">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> EXIT
+                  </span>
+                {% else %}
+                  <span class="badge bg-success text-white">
+                    <i class="bi bi-box-arrow-in-down-left me-1"></i> ENTRY
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="small fw-bold">{{ l.timestamp | time_only }}</div>
+                <div class="small text-muted" style="font-size: 0.72rem;">{{ l.timestamp | ist_date }}</div>
+              </td>
+              <td>
+                <span class="small text-muted">{{ l.notes or 'Verified.' }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50"></i>
+              No gate logs recorded yet at {{ guard_gate }}. Click "Launch QR Scanner" to verify an outpass.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

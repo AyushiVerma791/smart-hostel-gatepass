@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Student Movement Records — GatePass Warden{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-12 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">Student Campus Movement Records</h4>
+      <p class="text-muted small mb-0">Unified audit trail across all 4 campus gates, timestamps, and late-return flags</p>
+    </div>
+    <div>
+      <span class="badge bg-light text-navy border px-3 py-2">
+        <i class="bi bi-clock me-1"></i> Standard Curfew: 10:00 PM IST
+      </span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="col-12">
+    <div class="card card-gp p-3">
+      <form method="GET" action="{{ url_for('warden_movements') }}" class="row g-2 align-items-center">
+        <div class="col-12 col-md-3">
+          <input type="text" class="form-control form-control-sm" name="search" value="{{ search }}" placeholder="Search name, roll no, room...">
+        </div>
+        <div class="col-6 col-md-2">
+          <select class="form-select form-select-sm" name="status">
+            <option value="">All Statuses</option>
+            <option value="OUTSIDE" {% if status_filter == 'OUTSIDE' %}selected{% endif %}>Currently Outside</option>
+            <option value="COMPLETED" {% if status_filter == 'COMPLETED' %}selected{% endif %}>Returned / Completed</option>
+            <option value="APPROVED" {% if status_filter == 'APPROVED' %}selected{% endif %}>Approved (Not Left)</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select class="form-select form-select-sm" name="program">
+            <option value="">All Programs</option>
+            <option value="B.Tech" {% if program == 'B.Tech' %}selected{% endif %}>B.Tech</option>
+            <option value="M.Tech" {% if program == 'M.Tech' %}selected{% endif %}>M.Tech</option>
+            <option value="PhD" {% if program == 'PhD' %}selected{% endif %}>PhD</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <input type="date" class="form-control form-control-sm" name="date" value="{{ date_filter }}">
+        </div>
+        <div class="col-6 col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-navy btn-sm flex-grow-1">Apply Filters</button>
+          <a href="{{ url_for('warden_movements') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Movements Table -->
+  <div class="col-12">
+    <div class="card card-gp">
+      <div class="table-responsive">
+        <table class="table table-gp table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Pass ID</th>
+              <th>Student Details</th>
+              <th>Destination</th>
+              <th>Departure Log</th>
+              <th>Arrival Log</th>
+              <th>Expected Return</th>
+              <th>Lateness Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if movements %}
+              {% for m in movements %}
+                <tr class="{% if m.is_late %}table-danger{% endif %}">
+                  <td>
+                    <span class="fw-bold text-navy">#{{ m.pass_code }}</span>
+                    <div>
+                      <span class="badge-status {{ m.status.lower() }} mt-1" style="font-size: 0.68rem;">
+                        {{ m.status }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      {% if m.avatar %}
+                        <img src="{{ url_for('static', filename=m.avatar) }}" width="36" height="36" class="rounded-circle bg-white border" alt="Avatar">
+                      {% endif %}
+                      <div>
+                        <div class="fw-bold text-dark">{{ m.student_name }}</div>
+                        <div class="small text-muted font-monospace">{{ m.roll_number }} &bull; {{ m.program }}</div>
+                        <div class="small text-secondary" style="font-size: 0.72rem;">{{ m.hostel }} &bull; {{ m.room }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="fw-semibold text-dark">{{ m.destination }}</div>
+                    <div class="small text-muted text-truncate" style="max-width: 180px;">{{ m.purpose }}</div>
+                  </td>
+                  <td>
+                    {% if m.exit_time %}
+                      <div class="small fw-bold text-danger">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>{{ m.exit_gate }}
+                      </div>
+                      <div class="small text-muted">{{ m.exit_time | ist_date }}</div>
+                    {% else %}
+                      <span class="badge bg-secondary-subtle text-secondary small">Not yet exited</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if m.entry_time %}
+                      <div class="small fw-bold text-success">
+                        <i class="bi bi-box-arrow-in-down-left me-1"></i>{{ m.entry_gate }}
+                      </div>
+                      <div class="small text-muted">{{ m.entry_time | ist_date }}</div>
+                    {% elif m.status == 'OUTSIDE' %}
+                      <span class="badge bg-purple text-white small" style="background-color: var(--status-outside);">
+                        <i class="bi bi-geo-alt me-1"></i> Outside
+                      </span>
+                    {% else %}
+                      <span class="text-muted small">-</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="small fw-bold text-dark">{{ m.expected_return_datetime | time_only }}</div>
+                    <div class="small text-muted">{{ m.departure_date }}</div>
+                  </td>
+                  <td>
+                    {% if m.is_late %}
+                      <span class="badge bg-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> LATE ({{ m.minutes_late }} min)
+                      </span>
+                      <div class="small text-danger fw-semibold mt-1" style="font-size: 0.72rem;">
+                        {{ m.late_reason }}
+                      </div>
+                    {% elif m.status == 'COMPLETED' %}
+                      <span class="badge bg-success-subtle text-success border border-success-subtle">
+                        <i class="bi bi-check-circle me-1"></i> On Time
+                      </span>
+                    {% elif m.status == 'OUTSIDE' %}
+                      <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">
+                        <i class="bi bi-clock me-1"></i> In Transit
+                      </span>
+                    {% else %}
+                      <span class="text-muted small">Pending Exit</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">
+                  <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                  No movement records found matching your query.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

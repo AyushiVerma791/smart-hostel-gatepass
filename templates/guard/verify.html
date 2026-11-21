@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Outpass — {{ guard_gate }} Station{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center py-2">
+  
+  <!-- Left Column: Scanner & Search Input -->
+  <div class="col-12 col-lg-5">
+    
+    <!-- Station Header -->
+    <div class="card card-gp mb-3">
+      <div class="card-gp-header bg-white">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-warning text-dark p-2 rounded-circle fs-6">
+            <i class="bi bi-shield-check"></i>
+          </span>
+          <div>
+            <h5 class="fw-bold mb-0">{{ guard_gate }} Verification Console</h5>
+            <span class="text-muted small">Guard Officer: {{ current_user.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-3">
+        <!-- Live Camera QR Scanner Card -->
+        <div class="text-center mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="small fw-bold text-navy">
+              <i class="bi bi-camera-video-fill text-primary me-1"></i> Camera QR Code Scanner:
+            </span>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="start-scanner-btn">
+              <i class="bi bi-play-circle me-1"></i> Start Camera
+            </button>
+          </div>
+
+          <div id="scanner-status-message"></div>
+          
+          <div id="qr-reader" class="border rounded-3 bg-light shadow-sm" style="min-height: 220px; display: flex; align-items: center; justify-content: center;">
+            <div class="text-muted small p-4 text-center" id="scanner-placeholder">
+              <i class="bi bi-qr-code fs-1 d-block mb-2 text-secondary opacity-50"></i>
+              <span>Click <strong>Start Camera</strong> to activate mobile/webcam QR scanning, or use manual entry below.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center my-3 text-muted position-relative">
+          <hr>
+          <span class="position-absolute top-50 start-50 translate-middle bg-white px-2 small text-secondary fw-semibold">
+            OR MANUAL CODE LOOKUP
+          </span>
+        </div>
+
+        <!-- Manual Code / Token Entry Form -->
+        <form method="GET" action="{{ url_for('guard_verify') }}" id="lookupForm">
+          <div class="mb-2">
+            <label for="query" class="form-label small fw-semibold text-secondary">
+              Enter Pass Code or Verification Token:
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-upc"></i></span>
+              <input type="text" class="form-control font-monospace" id="query" name="query" 
+                     value="{{ search_query }}" placeholder="e.g. GP-2026-0007 or token" required autofocus>
+              <button class="btn btn-navy" type="submit">
+                <i class="bi bi-search me-1"></i> Verify
+              </button>
+            </div>
+            <div class="form-text small">Enter pass code printed on pass (e.g. <code>GP-2026-0007</code>).</div>
+          </div>
+        </form>
+
+        <!-- Quick 1-Click Verification Test Buttons -->
+        <div class="mt-3 p-3 bg-light rounded-3 border">
+          <div class="small fw-bold text-navy mb-2">
+            <i class="bi bi-lightning-charge text-warning me-1"></i> Quick Test Sample Passes:
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('guard_verify', query='GP-2026-0007') }}" class="btn btn-xs btn-outline-success btn-sm small">
+              <i class="bi bi-check-circle me-1"></i> Approved (Ready to Exit)
+            </a>
+            <a href="{{ url_for('guard_verify', query='GP-2026-0017') }}" class="btn btn-xs btn-outline-info btn-sm small">
+              <i class="bi bi-door-open me-1"></i> Outside (Ready to Return)
+            </a>
+            <a href="{{ url_for('guard_verify', query='GP-2026-0019') }}" class="btn btn-xs btn-outline-danger btn-sm small">
+              <i class="bi bi-alarm me-1"></i> Outside (Overdue/Late)
+            </a>
+            <a href="{{ url_for('guard_verify', query='GP-2026-0022') }}" class="btn btn-xs btn-outline-secondary btn-sm small">
+              <i class="bi bi-check-all me-1"></i> Already Completed
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Verification Result Card -->
+  <div class="col-12 col-lg-7">
+    
+    {% if error_msg %}
+      <div class="card card-gp border-danger shadow-sm mb-3">
+        <div class="card-body p-4 text-center">
+          <i class="bi bi-shield-x fs-1 text-danger d-block mb-2"></i>
+          <h5 class="fw-bold text-danger">Verification Failed</h5>
+          <p class="text-secondary mb-3">{{ error_msg }}</p>
+          <div class="alert alert-warning small mb-0">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            Security Protocol: Do not permit exit or entry without an authorized, valid system pass.
+          </div>
+        </div>
+      </div>
+    {% elif pass_data %}
+      <div class="card card-gp shadow-lg border-2 {% if pass_data.status == 'APPROVED' %}border-success{% elif pass_data.status == 'OUTSIDE' %}border-info{% elif pass_data.status == 'COMPLETED' %}border-secondary{% else %}border-danger{% endif %}">
+        
+        <!-- Status Header -->
+        <div class="p-3 text-center {% if pass_data.status == 'APPROVED' %}bg-success text-white{% elif pass_data.status == 'OUTSIDE' %}bg-primary text-white{% elif pass_data.status == 'COMPLETED' %}bg-secondary text-white{% else %}bg-danger text-white{% endif %}">
+          <h5 class="fw-bold mb-0">
+            {% if pass_data.status == 'APPROVED' %}
+              <i class="bi bi-check-circle-fill me-1"></i> VALID APPROVED PASS &bull; READY FOR EXIT
+            {% elif pass_data.status == 'OUTSIDE' %}
+              <i class="bi bi-door-open-fill me-1"></i> STUDENT IS CURRENTLY OUTSIDE &bull; READY FOR ENTRY
+            {% elif pass_data.status == 'COMPLETED' %}
+              <i class="bi bi-check-all me-1"></i> PASS ALREADY COMPLETED &bull; ENTRY PREVENTED
+            {% elif pass_data.status == 'PENDING' %}
+              <i class="bi bi-clock-history me-1"></i> NOT APPROVED YET &bull; EXIT DENIED
+            {% elif pass_data.status == 'REJECTED' %}
+              <i class="bi bi-x-circle-fill me-1"></i> APPLICATION REJECTED &bull; EXIT DENIED
+            {% endif %}
+          </h5>
+          <div class="small opacity-75 mt-1 font-monospace">Pass Code: #{{ pass_data.pass_code }}</div>
+        </div>
+
+        <div class="card-body p-4">
+          
+          <!-- Student Visual Identification Section -->
+          <div class="p-3 bg-light rounded-3 border mb-3">
+            <div class="row align-items-center">
+              <div class="col-12 col-sm-4 text-center mb-2 mb-sm-0">
+                {% if pass_data.avatar %}
+                  <img src="{{ url_for('static', filename=pass_data.avatar) }}" width="110" height="110" class="rounded-circle border border-3 border-white shadow-sm bg-white" alt="Student Photo">
+                {% else %}
+                  <div class="rounded-circle bg-navy text-white d-flex align-items-center justify-content-center fw-bold fs-2 mx-auto" style="width: 100px; height: 100px;">
+                    {{ pass_data.student_name[:2] }}
+                  </div>
+                {% endif %}
+                <div class="badge bg-warning text-dark mt-2 fw-bold" style="font-size: 0.7rem;">
+                  <i class="bi bi-eye-fill me-1"></i> VERIFY FACE
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-8">
+                <h4 class="fw-bold text-navy mb-1">{{ pass_data.student_name }}</h4>
+                <div class="text-dark font-monospace fw-bold mb-1">
+                  Roll No: <span class="badge bg-light text-dark border fs-6">{{ pass_data.roll_number }}</span>
+                </div>
+                <div class="small text-secondary">
+                  <strong>Program:</strong> {{ pass_data.program }} &bull; {{ pass_data.department }}
+                </div>
+                <div class="small text-secondary">
+                  <strong>Hostel:</strong> {{ pass_data.hostel }} &bull; <strong>Room:</strong> {{ pass_data.room }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Outpass Details Grid -->
+          <div class="row g-2 small mb-3">
+            <div class="col-6">
+              <div class="p-2 border rounded bg-white">
+                <span class="text-muted d-block" style="font-size: 0.72rem;">APPROVED DESTINATION</span>
+                <span class="fw-bold text-dark">{{ pass_data.destination }}</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 border rounded bg-white">
+                <span class="text-muted d-block" style="font-size: 0.72rem;">EXPECTED RETURN TIME</span>
+                <span class="fw-bold text-dark">{{ pass_data.expected_return_datetime | time_only }}</span>
+                <span class="text-danger" style="font-size: 0.7rem;">(Curfew: 10 PM)</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-2 border rounded bg-white">
+                <span class="text-muted d-block" style="font-size: 0.72rem;">PURPOSE</span>
+                <span class="text-dark">{{ pass_data.purpose }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prior Movement Details if any -->
+          {% if pass_data.exit_time %}
+            <div class="alert alert-secondary py-2 small mb-3">
+              <i class="bi bi-box-arrow-up-right text-danger me-1"></i>
+              <strong>Exit Recorded:</strong> Exited via <strong>{{ pass_data.exit_gate }}</strong> at {{ pass_data.exit_time | ist_date }}.
+            </div>
+          {% endif %}
+
+          {% if pass_data.entry_time %}
+            <div class="alert alert-secondary py-2 small mb-3">
+              <i class="bi bi-box-arrow-in-down-left text-success me-1"></i>
+              <strong>Entry Recorded:</strong> Returned via <strong>{{ pass_data.entry_gate }}</strong> at {{ pass_data.entry_time | ist_date }}.
+            </div>
+          {% endif %}
+
+          <!-- Lateness Alert Warning -->
+          {% if pass_data.is_late %}
+            <div class="alert alert-danger py-2 small mb-3">
+              <i class="bi bi-exclamation-triangle-fill fs-5 me-1"></i>
+              <strong>LATE RETURN WARNING:</strong> Student is {{ pass_data.minutes_late }} minutes late past the deadline ({{ pass_data.late_reason }}).
+            </div>
+          {% endif %}
+
+          <hr class="my-3">
+
+          <!-- Guard Action Buttons -->
+          <div class="text-center">
+            
+            {% if pass_data.status == 'APPROVED' %}
+              <!-- Action 1: Confirm EXIT -->
+              <form method="POST" action="{{ url_for('guard_record_exit') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="outpass_id" value="{{ pass_data.id }}">
+                <input type="hidden" name="return_query" value="{{ search_query }}">
+                
+                <div class="mb-3 text-start">
+                  <label class="form-label small fw-semibold text-secondary">Guard Observation Note (Optional):</label>
+                  <input type="text" class="form-control form-control-sm" name="notes" value="Photo and physical identity verified at {{ guard_gate }}.">
+                </div>
+
+                <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold shadow">
+                  <i class="bi bi-box-arrow-up-right me-2"></i> CONFIRM EXIT & LOG DEPARTURE AT {{ guard_gate }}
+                </button>
+              </form>
+
+            {% elif pass_data.status == 'OUTSIDE' %}
+              <!-- Action 2: Confirm ENTRY -->
+              <form method="POST" action="{{ url_for('guard_record_entry') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="outpass_id" value="{{ pass_data.id }}">
+                <input type="hidden" name="return_query" value="{{ search_query }}">
+
+                <div class="mb-3 text-start">
+                  <label class="form-label small fw-semibold text-secondary">Guard Observation Note (Optional):</label>
+                  <input type="text" class="form-control form-control-sm" name="notes" value="Student returned safely; photo confirmed at {{ guard_gate }}.">
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold shadow">
+                  <i class="bi bi-box-arrow-in-down-left me-2"></i> CONFIRM ENTRY & LOG ARRIVAL AT {{ guard_gate }}
+                </button>
+              </form>
+
+            {% elif pass_data.status == 'COMPLETED' %}
+              <div class="p-3 bg-light rounded text-muted">
+                <i class="bi bi-lock-fill fs-4 d-block mb-1 text-secondary"></i>
+                This outpass has already completed its full lifecycle (Exit & Entry logged). No further movement can be logged.
+              </div>
+
+            {% else %}
+              <div class="p-3 bg-light rounded text-danger">
+                <i class="bi bi-slash-circle fs-4 d-block mb-1"></i>
+                Cannot record movement: This pass has not been authorized by the Warden.
+              </div>
+            {% endif %}
+
+          </div>
+
+        </div>
+        <div class="card-footer bg-light border-top text-center py-2 text-muted small">
+          Active Station: <strong>{{ guard_gate }}</strong> &bull; Authenticated Guard: <strong>{{ current_user.name }}</strong>
+        </div>
+      </div>
+    {% else %}
+      <!-- Empty Initial State -->
+      <div class="card card-gp h-100 d-flex align-items-center justify-content-center p-5 text-center text-muted">
+        <div>
+          <i class="bi bi-shield-check fs-1 text-primary opacity-50 d-block mb-3"></i>
+          <h5 class="fw-bold text-dark">Security Guard Verification Console</h5>
+          <p class="small text-secondary mb-3" style="max-width: 400px;">
+            Scan a student's digital QR pass using the camera scanner on the left, or manually enter their Pass Code to verify identity and record exit or arrival.
+          </p>
+          <div class="badge bg-light text-navy border px-3 py-2 small">
+            <i class="bi bi-info-circle me-1"></i> Station: <strong>{{ guard_gate }}</strong>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const startBtn = document.getElementById("start-scanner-btn");
+  const placeholder = document.getElementById("scanner-placeholder");
+
+  if (startBtn) {
+    startBtn.addEventListener("click", () => {
+      startBtn.disabled = true;
+      startBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Initializing Camera...';
+      if (placeholder) placeholder.style.display = "none";
+
+      initQrCameraScanner("qr-reader", (decodedText) => {
+        // Redirect to verify query with scanned token
+        window.location.href = "{{ url_for('guard_verify') }}?query=" + encodeURIComponent(decodedText);
+      });
+    });
+  }
+});
+</script>
+{% endblock %}

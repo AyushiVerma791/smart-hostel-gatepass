@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}System Analytics & CSV Insights — GatePass{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-12 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">Outpass Analytics & CSV Data Intelligence</h4>
+      <p class="text-muted small mb-0">Analysis of movement logs, gate loads, curfew compliance, and outpass durations</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-warning text-dark border px-3 py-2">
+        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Source: data.csv + Live DB
+      </span>
+    </div>
+  </div>
+
+  <!-- Synthetic Data Provenance Alert -->
+  <div class="col-12">
+    <div class="alert alert-info py-2 d-flex align-items-center gap-2 border-0 shadow-sm">
+      <i class="bi bi-info-circle-fill text-primary fs-5"></i>
+      <div class="small">
+        <strong>Data Provenance Notice:</strong> {{ analytics.dataset_notice }} 
+        (36 simulated records across 4 gates for SDE-1 evaluation).
+      </div>
+    </div>
+  </div>
+
+  <!-- High-Level KPI Cards -->
+  <div class="col-6 col-md-3">
+    <div class="kpi-card">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Total Requests</div>
+        <h3 class="fw-bold mb-0 mt-1 text-navy">{{ analytics.total_records }}</h3>
+        <span class="small text-muted">{{ analytics.completed_count }} journeys completed</span>
+      </div>
+      <div class="kpi-icon bg-light text-navy">
+        <i class="bi bi-stack"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="kpi-card">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Average Duration</div>
+        <h3 class="fw-bold mb-0 mt-1 text-primary">{{ analytics.avg_duration_formatted }}</h3>
+        <span class="small text-muted">~{{ analytics.avg_duration_minutes }} minutes/outpass</span>
+      </div>
+      <div class="kpi-icon bg-primary-subtle text-primary">
+        <i class="bi bi-stopwatch"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="kpi-card">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Late Returns</div>
+        <h3 class="fw-bold mb-0 mt-1 text-danger">{{ analytics.late_returns_count }}</h3>
+        <span class="small text-danger fw-semibold">{{ analytics.late_return_percentage }}% delinquency rate</span>
+      </div>
+      <div class="kpi-icon bg-danger-subtle text-danger">
+        <i class="bi bi-exclamation-triangle"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="kpi-card">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Rejection Rate</div>
+        <h3 class="fw-bold mb-0 mt-1 text-secondary">{{ analytics.rejected_count }}</h3>
+        <span class="small text-muted">{{ ((analytics.rejected_count / analytics.total_records) * 100) | round(1) }}% of requests</span>
+      </div>
+      <div class="kpi-icon bg-secondary-subtle text-secondary">
+        <i class="bi bi-shield-x"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Gate Traffic Breakdown -->
+  <div class="col-12 col-lg-7">
+    <div class="card card-gp h-100">
+      <div class="card-gp-header">
+        <div>
+          <h5 class="fw-bold mb-0">Gate-Wise Traffic Volume</h5>
+          <span class="text-muted small">Distribution of student exits and arrivals across all 4 campus gates</span>
+        </div>
+        <span class="badge bg-light text-dark border">4 Active Gates</span>
+      </div>
+
+      <div class="card-body p-4">
+        <div class="table-responsive mb-3">
+          <table class="table table-bordered align-middle text-center mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="text-start">Campus Gate</th>
+                <th>Exits (Departures)</th>
+                <th>Entries (Arrivals)</th>
+                <th>Total Volume</th>
+                <th>Traffic Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ga in analytics.gate_activity %}
+                <tr>
+                  <td class="text-start fw-bold text-navy">
+                    <i class="bi bi-door-closed me-1"></i> {{ ga.gate }}
+                  </td>
+                  <td>
+                    <span class="badge bg-danger-subtle text-danger fw-bold">{{ ga.exits }}</span>
+                  </td>
+                  <td>
+                    <span class="badge bg-success-subtle text-success fw-bold">{{ ga.entries }}</span>
+                  </td>
+                  <td class="fw-bold">{{ ga.total }}</td>
+                  <td style="width: 28%;">
+                    {% set total_movements = (analytics.completed_count * 2) + analytics.outside_count %}
+                    {% set percent = ((ga.total / (total_movements if total_movements > 0 else 1)) * 100) | round(0) | int %}
+                    <div class="progress" style="height: 18px;">
+                      <div class="progress-bar bg-navy" role="progressbar" style="width: {{ percent }}%;" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">
+                        {{ percent }}%
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-light border small text-muted mb-0">
+          <i class="bi bi-lightbulb me-1"></i> <strong>Operational Observation:</strong> Gate 1 handles the highest traffic share as it faces the main university avenue, while Gate 3 and Gate 4 handle sports and residential transit.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Program Distribution & Top Destinations -->
+  <div class="col-12 col-lg-5">
+    <div class="card card-gp h-100">
+      <div class="card-gp-header">
+        <div>
+          <h5 class="fw-bold mb-0">Demographics & Top Visits</h5>
+          <span class="text-muted small">Distribution by academic program and destinations</span>
+        </div>
+      </div>
+
+      <div class="card-body p-4">
+        <h6 class="fw-bold text-secondary small text-uppercase mb-3">Program Distribution</h6>
+        {% for prog, count in analytics.program_counts.items() %}
+          <div class="d-flex justify-content-between align-items-center mb-1 small">
+            <span class="fw-semibold">{{ prog }}</span>
+            <span class="text-muted">{{ count }} requests ({{ ((count / analytics.total_records) * 100) | round(0) | int }}%)</span>
+          </div>
+          <div class="progress mb-3" style="height: 8px;">
+            <div class="progress-bar {% if prog == 'B.Tech' %}bg-primary{% elif prog == 'M.Tech' %}bg-info{% else %}bg-warning{% endif %}" 
+                 style="width: {{ ((count / analytics.total_records) * 100) | round(0) | int }}%;"></div>
+          </div>
+        {% endfor %}
+
+        <hr class="my-4 text-muted">
+
+        <h6 class="fw-bold text-secondary small text-uppercase mb-2">Top Visited Destinations</h6>
+        <ul class="list-group list-group-flush small">
+          {% for dest, cnt in analytics.top_destinations %}
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+              <span><i class="bi bi-geo-alt me-1 text-primary"></i> {{ dest }}</span>
+              <span class="badge bg-light text-navy border">{{ cnt }} visits</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

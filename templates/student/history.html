@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}My Outpass History — GatePass{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-12 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">Outpass Request History</h4>
+      <p class="text-muted small mb-0">Complete historical audit log of your digital outpass applications</p>
+    </div>
+    <div>
+      <a href="{{ url_for('student_apply') }}" class="btn btn-navy shadow-sm">
+        <i class="bi bi-plus-circle me-1"></i> New Application
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter Pills -->
+  <div class="col-12">
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{{ url_for('student_history') }}" class="btn btn-sm {% if not selected_status %}btn-navy{% else %}btn-outline-secondary{% endif %}">
+        All Passes
+      </a>
+      <a href="{{ url_for('student_history', status='APPROVED') }}" class="btn btn-sm {% if selected_status == 'APPROVED' %}btn-success{% else %}btn-outline-success{% endif %}">
+        Approved
+      </a>
+      <a href="{{ url_for('student_history', status='OUTSIDE') }}" class="btn btn-sm {% if selected_status == 'OUTSIDE' %}btn-info{% else %}btn-outline-info{% endif %}">
+        Currently Outside
+      </a>
+      <a href="{{ url_for('student_history', status='COMPLETED') }}" class="btn btn-sm {% if selected_status == 'COMPLETED' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+        Completed / Returned
+      </a>
+      <a href="{{ url_for('student_history', status='PENDING') }}" class="btn btn-sm {% if selected_status == 'PENDING' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+        Pending Review
+      </a>
+      <a href="{{ url_for('student_history', status='REJECTED') }}" class="btn btn-sm {% if selected_status == 'REJECTED' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+        Rejected
+      </a>
+    </div>
+  </div>
+
+  <!-- Master History Table -->
+  <div class="col-12">
+    <div class="card card-gp shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-gp table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Pass ID</th>
+              <th>Destination</th>
+              <th>Departure Schedule</th>
+              <th>Expected Return</th>
+              <th>Status</th>
+              <th>Gate Logs (Exit & Entry)</th>
+              <th class="text-end">Pass Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if outpasses %}
+              {% for p in outpasses %}
+                <tr>
+                  <td>
+                    <span class="fw-bold text-navy">#{{ p.pass_code }}</span>
+                    <div class="small text-muted">{{ p.created_at | ist_date }}</div>
+                  </td>
+                  <td>
+                    <div class="fw-semibold text-dark">{{ p.destination }}</div>
+                    <div class="small text-muted text-truncate" style="max-width: 200px;">{{ p.purpose }}</div>
+                    {% if p.rejection_reason %}
+                      <div class="small text-danger mt-1">
+                        <i class="bi bi-info-circle me-1"></i><strong>Declined:</strong> {{ p.rejection_reason }}
+                      </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="small fw-semibold">{{ p.departure_date }}</div>
+                    <div class="small text-muted">{{ p.planned_exit_datetime | time_only }}</div>
+                  </td>
+                  <td>
+                    <div class="small fw-semibold">{{ p.expected_return_datetime | time_only }}</div>
+                    {% if p.is_late %}
+                      <span class="badge bg-danger small" style="font-size: 0.65rem;">
+                        <i class="bi bi-exclamation-triangle me-1"></i>LATE ({{ p.minutes_late }}m)
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge-status {{ p.status.lower() }}">
+                      {% if p.status == 'PENDING' %}
+                        <i class="bi bi-clock-history"></i> Pending
+                      {% elif p.status == 'APPROVED' %}
+                        <i class="bi bi-check2"></i> Approved
+                      {% elif p.status == 'OUTSIDE' %}
+                        <i class="bi bi-door-open"></i> Outside
+                      {% elif p.status == 'COMPLETED' %}
+                        <i class="bi bi-check-all"></i> Returned
+                      {% elif p.status == 'REJECTED' %}
+                        <i class="bi bi-x"></i> Rejected
+                      {% endif %}
+                    </span>
+                  </td>
+                  <td>
+                    {% if p.exit_time %}
+                      <div class="small text-danger">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> <strong>Exited:</strong> {{ p.exit_gate }} &bull; {{ p.exit_time | time_only }}
+                      </div>
+                    {% endif %}
+                    {% if p.entry_time %}
+                      <div class="small text-success">
+                        <i class="bi bi-box-arrow-in-down-left me-1"></i> <strong>Returned:</strong> {{ p.entry_gate }} &bull; {{ p.entry_time | time_only }}
+                      </div>
+                    {% elif p.status == 'OUTSIDE' %}
+                      <div class="small text-primary fw-semibold">
+                        <i class="bi bi-geo-alt-fill me-1"></i> Currently Outside
+                      </div>
+                    {% elif not p.exit_time and p.status == 'APPROVED' %}
+                      <div class="small text-muted">Ready to present at gate</div>
+                    {% else %}
+                      <div class="small text-muted">-</div>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <a href="{{ url_for('student_pass_view', outpass_id=p.id) }}" class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-qr-code me-1"></i> View Pass
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">
+                  <i class="bi bi-search fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                  No outpasses found matching this filter criteria.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

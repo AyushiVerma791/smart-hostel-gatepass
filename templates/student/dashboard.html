@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard — GatePass{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <!-- Profile & Welcome Banner -->
+  <div class="col-12">
+    <div class="card card-gp border-0 p-3 p-md-4 shadow-sm" style="background: linear-gradient(135deg, #0d2b45 0%, #173f5f 100%); color: #ffffff;">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+          {% if current_user.avatar %}
+            <img src="{{ url_for('static', filename=current_user.avatar) }}" width="64" height="64" class="rounded-circle border border-2 border-white shadow-sm bg-white" alt="Avatar">
+          {% else %}
+            <div class="rounded-circle bg-white text-navy d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 64px; height: 64px;">
+              {{ current_user.name[:2] }}
+            </div>
+          {% endif %}
+          <div>
+            <h4 class="fw-bold mb-1">{{ current_user.name }}</h4>
+            <div class="small opacity-75">
+              <span><i class="bi bi-upc-scan me-1"></i>{{ current_user.roll_number }}</span> &bull; 
+              <span><i class="bi bi-mortarboard me-1"></i>{{ current_user.program }} ({{ current_user.department }})</span> &bull;
+              <span><i class="bi bi-building me-1"></i>{{ current_user.hostel }} &bull; Room {{ current_user.room }}</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <a href="{{ url_for('student_apply') }}" class="btn btn-warning fw-bold px-4 py-2 shadow-sm">
+            <i class="bi bi-plus-circle-fill me-1"></i> Apply for Outpass
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Pass Banner (If Approved or Outside) -->
+  {% if active_pass %}
+    <div class="col-12">
+      <div class="card border-2 {% if active_pass.status == 'OUTSIDE' %}border-info bg-info-subtle{% else %}border-success bg-success-subtle{% endif %} rounded-4 p-3 shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge {% if active_pass.status == 'OUTSIDE' %}bg-info text-dark{% else %}bg-success{% endif %} fs-6">
+                {% if active_pass.status == 'OUTSIDE' %}
+                  <i class="bi bi-door-open-fill me-1"></i> CURRENTLY OUTSIDE CAMPUS
+                {% else %}
+                  <i class="bi bi-qr-code me-1"></i> READY FOR EXIT
+                {% endif %}
+              </span>
+              <span class="fw-bold text-dark">#{{ active_pass.pass_code }}</span>
+            </div>
+            <div class="small text-secondary">
+              <strong>Destination:</strong> {{ active_pass.destination }} &bull; 
+              <strong>Expected Return:</strong> {{ active_pass.expected_return_datetime | ist_date }}
+              {% if active_pass.exit_time %}
+                &bull; <strong>Departed at:</strong> {{ active_pass.exit_time | ist_date }} via {{ active_pass.exit_gate }}
+              {% endif %}
+            </div>
+          </div>
+          <div>
+            <a href="{{ url_for('student_pass_view', outpass_id=active_pass.id) }}" class="btn btn-navy shadow-sm">
+              <i class="bi bi-qr-code-scan me-1"></i> Open Digital QR Pass
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- KPI Overview Cards -->
+  <div class="col-6 col-md-3">
+    <div class="kpi-card">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Total Applied</div>
+        <h3 class="fw-bold mb-0 mt-1">{{ total_count }}</h3>
+      </div>
+      <div class="kpi-icon bg-light text-primary">
+        <i class="bi bi-journal-text"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="kpi-card">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Pending Review</div>
+        <h3 class="fw-bold mb-0 mt-1 text-warning">{{ pending_count }}</h3>
+      </div>
+      <div class="kpi-icon bg-warning-subtle text-warning">
+        <i class="bi bi-hourglass-split"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="kpi-card">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Approved / Completed</div>
+        <h3 class="fw-bold mb-0 mt-1 text-success">{{ approved_count }}</h3>
+      </div>
+      <div class="kpi-icon bg-success-subtle text-success">
+        <i class="bi bi-check-circle"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="kpi-card">
+      <div>
+        <div class="text-muted small fw-semibold text-uppercase">Rejected</div>
+        <h3 class="fw-bold mb-0 mt-1 text-danger">{{ rejected_count }}</h3>
+      </div>
+      <div class="kpi-icon bg-danger-subtle text-danger">
+        <i class="bi bi-x-circle"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Outpass History Table -->
+<div class="card card-gp">
+  <div class="card-gp-header">
+    <div>
+      <h5 class="fw-bold mb-0">Recent Outpasses</h5>
+      <span class="text-muted small">Your latest gate pass applications and movement timestamps</span>
+    </div>
+    <a href="{{ url_for('student_history') }}" class="btn btn-outline-primary btn-sm">
+      View All History <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-gp table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Pass Code</th>
+          <th>Destination & Purpose</th>
+          <th>Planned Departure</th>
+          <th>Expected Return</th>
+          <th>Status</th>
+          <th>Movement Activity</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if outpasses %}
+          {% for p in outpasses %}
+            <tr>
+              <td>
+                <span class="fw-bold text-navy">#{{ p.pass_code }}</span>
+              </td>
+              <td>
+                <div class="fw-semibold text-dark">{{ p.destination }}</div>
+                <div class="small text-muted text-truncate" style="max-width: 200px;">{{ p.purpose }}</div>
+              </td>
+              <td>
+                <div class="small fw-semibold">{{ p.departure_date }}</div>
+                <div class="small text-muted">{{ p.planned_exit_datetime | time_only }}</div>
+              </td>
+              <td>
+                <div class="small fw-semibold">{{ p.expected_return_datetime | time_only }}</div>
+                {% if p.is_late %}
+                  <span class="badge bg-danger small" style="font-size: 0.65rem;">LATE ({{ p.minutes_late }}m)</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge-status {{ p.status.lower() }}">
+                  {% if p.status == 'PENDING' %}
+                    <i class="bi bi-clock-history"></i> Pending
+                  {% elif p.status == 'APPROVED' %}
+                    <i class="bi bi-check2"></i> Approved
+                  {% elif p.status == 'OUTSIDE' %}
+                    <i class="bi bi-door-open"></i> Outside
+                  {% elif p.status == 'COMPLETED' %}
+                    <i class="bi bi-check-all"></i> Returned
+                  {% elif p.status == 'REJECTED' %}
+                    <i class="bi bi-x"></i> Rejected
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                {% if p.exit_time %}
+                  <div class="small"><i class="bi bi-arrow-up-right text-danger me-1"></i> Exit: {{ p.exit_gate }} at {{ p.exit_time | time_only }}</div>
+                {% endif %}
+                {% if p.entry_time %}
+                  <div class="small"><i class="bi bi-arrow-down-left text-success me-1"></i> Entry: {{ p.entry_gate }} at {{ p.entry_time | time_only }}</div>
+                {% elif p.status == 'OUTSIDE' %}
+                  <div class="small text-info fw-semibold"><i class="bi bi-geo-alt me-1"></i> Currently Outside</div>
+                {% elif not p.exit_time and p.status == 'APPROVED' %}
+                  <div class="small text-muted">Ready for gate exit</div>
+                {% else %}
+                  <div class="small text-muted">-</div>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <a href="{{ url_for('student_pass_view', outpass_id=p.id) }}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-eye"></i> View
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50"></i>
+              No outpass applications yet. Click "Apply for Outpass" to create one.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

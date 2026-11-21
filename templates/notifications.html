@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications Center — GatePass{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+  <div class="col-12 col-md-10 col-lg-8">
+    
+    <div class="card card-gp shadow-sm">
+      <div class="card-gp-header bg-white">
+        <div>
+          <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">Notification Alerts</h4>
+          <span class="text-muted small">Live updates regarding outpass status changes, approvals, and gate activities</span>
+        </div>
+        
+        {% if notifications %}
+          <form method="POST" action="{{ url_for('mark_all_notifications_read') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-check2-all me-1"></i> Mark All as Read
+            </button>
+          </form>
+        {% endif %}
+      </div>
+
+      <div class="card-body p-0">
+        {% if notifications %}
+          <div class="list-group list-group-flush">
+            {% for n in notifications %}
+              <div class="list-group-item p-3 d-flex align-items-start gap-3 {% if not n.is_read %}bg-light border-start border-4 border-primary{% endif %}">
+                <div class="mt-1">
+                  {% if n.category == 'success' %}
+                    <span class="badge bg-success-subtle text-success p-2 rounded-circle fs-6">
+                      <i class="bi bi-check-circle-fill"></i>
+                    </span>
+                  {% elif n.category == 'danger' %}
+                    <span class="badge bg-danger-subtle text-danger p-2 rounded-circle fs-6">
+                      <i class="bi bi-exclamation-octagon-fill"></i>
+                    </span>
+                  {% elif n.category == 'warning' %}
+                    <span class="badge bg-warning-subtle text-warning p-2 rounded-circle fs-6">
+                      <i class="bi bi-exclamation-circle-fill"></i>
+                    </span>
+                  {% else %}
+                    <span class="badge bg-primary-subtle text-primary p-2 rounded-circle fs-6">
+                      <i class="bi bi-info-circle-fill"></i>
+                    </span>
+                  {% endif %}
+                </div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <h6 class="fw-bold mb-1 text-dark">
+                      {{ n.title }}
+                      {% if not n.is_read %}
+                        <span class="badge bg-primary ms-1" style="font-size: 0.65rem;">NEW</span>
+                      {% endif %}
+                    </h6>
+                    <span class="text-muted small" style="font-size: 0.75rem;">
+                      {{ n.created_at | ist_date }}
+                    </span>
+                  </div>
+
+                  <p class="text-secondary small mb-2">{{ n.message }}</p>
+
+                  <div class="d-flex align-items-center gap-2">
+                    {% if n.link %}
+                      <a href="{{ n.link }}" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.78rem;">
+                        View Details <i class="bi bi-arrow-right ms-1"></i>
+                      </a>
+                    {% endif %}
+
+                    {% if not n.is_read %}
+                      <form method="POST" action="{{ url_for('mark_notification_read', notification_id=n.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-sm btn-link text-muted py-0 px-1 text-decoration-none" style="font-size: 0.75rem;">
+                          Mark as read
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-bell-slash fs-1 d-block mb-2 text-secondary opacity-50"></i>
+            <h6 class="fw-semibold">No Notifications</h6>
+            <p class="small text-secondary mb-0">You have no alerts at this time.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

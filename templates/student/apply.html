@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Outpass — GatePass{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-2">
+  <div class="col-12 col-lg-8">
+    
+    <div class="card card-gp shadow-sm">
+      <div class="card-gp-header bg-white">
+        <div>
+          <h4 class="fw-bold mb-1" style="color: var(--primary-navy);">Hostel Outpass Application</h4>
+          <span class="text-muted small">Submit digital permission to leave the campus after 6:00 PM</span>
+        </div>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+          <i class="bi bi-clock me-1"></i> Night Curfew: 10:00 PM IST
+        </span>
+      </div>
+
+      <div class="card-body p-4">
+        <!-- Student Info Summary Strip -->
+        <div class="alert alert-light border d-flex flex-wrap align-items-center justify-content-between gap-2 p-3 mb-4 rounded-3">
+          <div class="d-flex align-items-center gap-2">
+            {% if current_user.avatar %}
+              <img src="{{ url_for('static', filename=current_user.avatar) }}" width="40" height="40" class="rounded-circle bg-white" alt="Avatar">
+            {% else %}
+              <i class="bi bi-person-circle fs-3 text-secondary"></i>
+            {% endif %}
+            <div>
+              <div class="fw-bold text-dark">{{ current_user.name }} ({{ current_user.roll_number }})</div>
+              <div class="small text-muted">{{ current_user.program }} &bull; {{ current_user.department }}</div>
+            </div>
+          </div>
+          <div class="text-md-end small text-muted">
+            <div><i class="bi bi-building me-1"></i>{{ current_user.hostel }}</div>
+            <div><i class="bi bi-door-closed me-1"></i>Room: {{ current_user.room }}</div>
+          </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('student_apply') }}" id="outpassForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+          <div class="row g-3">
+            <!-- Destination -->
+            <div class="col-12 col-md-6">
+              <label for="destination" class="form-label fw-semibold small text-secondary">
+                Destination <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" id="destination" name="destination" 
+                     placeholder="e.g. Civil Lines Market, Central Library" required>
+            </div>
+
+            <!-- Date -->
+            <div class="col-12 col-md-6">
+              <label for="departure_date" class="form-label fw-semibold small text-secondary">
+                Date of Outpass <span class="text-danger">*</span>
+              </label>
+              <input type="date" class="form-control" id="departure_date" name="departure_date" 
+                     value="{{ today_date }}" required>
+            </div>
+
+            <!-- Departure Time -->
+            <div class="col-12 col-md-6">
+              <label for="departure_time" class="form-label fw-semibold small text-secondary">
+                Planned Departure Time <span class="text-danger">*</span>
+              </label>
+              <input type="time" class="form-control" id="departure_time" name="departure_time" 
+                     value="18:30" required>
+              <div class="form-text small">Outpasses apply for evening leave (after 6:00 PM).</div>
+            </div>
+
+            <!-- Expected Return Time -->
+            <div class="col-12 col-md-6">
+              <label for="expected_return_time" class="form-label fw-semibold small text-secondary">
+                Expected Return Time <span class="text-danger">*</span>
+              </label>
+              <input type="time" class="form-control" id="expected_return_time" name="expected_return_time" 
+                     value="21:30" required>
+              <div class="form-text small text-danger fw-semibold">
+                Must be before 10:00 PM (22:00) campus night cutoff.
+              </div>
+            </div>
+
+            <!-- Purpose -->
+            <div class="col-12">
+              <label for="purpose" class="form-label fw-semibold small text-secondary">
+                Purpose of Visit <span class="text-danger">*</span>
+              </label>
+              <textarea class="form-control" id="purpose" name="purpose" rows="3" 
+                        placeholder="State clear purpose (e.g. Purchasing academic study material, Medical consultation, Family visit)" required></textarea>
+            </div>
+
+            <!-- Digital Declaration Checkbox -->
+            <div class="col-12 mt-4">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="declaration" name="declaration" value="1" required>
+                  <label class="form-check-label small" for="declaration">
+                    <strong>Digital Student Declaration:</strong> I hereby declare that the details submitted above are accurate. 
+                    I agree to follow all hostel and campus safety regulations, and I undertake to return to the campus through 
+                    any authorized gate before the approved expected return time and before the 10:00 PM hostel curfew. 
+                    I acknowledge that late returns are digitally logged and alerted to the Warden office.
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-12 mt-4 d-flex justify-content-between align-items-center">
+              <a href="{{ url_for('student_dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-navy px-4 py-2 shadow-sm">
+                <i class="bi bi-send-fill me-1"></i> Submit to Warden
+              </button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

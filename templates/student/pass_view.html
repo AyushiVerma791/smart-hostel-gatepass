@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Digital Outpass #{{ pass_data.pass_code }} — GatePass{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+  <div class="col-12 col-md-8 col-lg-6">
+
+    <!-- Back / Navigation Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+      <a href="{{ url_for('student_history') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to History
+      </a>
+      <button onclick="window.print()" class="btn btn-navy btn-sm shadow-sm">
+        <i class="bi bi-printer me-1"></i> Print / Save Pass
+      </button>
+    </div>
+
+    <!-- Digital Boarding Card -->
+    <div class="digital-pass-card">
+      <div class="pass-header">
+        <div class="text-uppercase small tracking-wide fw-bold opacity-75">Campus Hostel Administration</div>
+        <h4 class="fw-bold mb-1">OFFICIAL DIGITAL OUTPASS</h4>
+        <div class="badge bg-white text-navy fw-bold px-3 py-1 fs-6 mt-1 shadow-sm">
+          #{{ pass_data.pass_code }}
+        </div>
+      </div>
+
+      <!-- Student Identity Photo & Banner -->
+      <div class="text-center">
+        {% if pass_data.avatar %}
+          <img src="{{ url_for('static', filename=pass_data.avatar) }}" class="pass-photo" alt="{{ pass_data.student_name }}">
+        {% else %}
+          <div class="pass-photo mx-auto d-flex align-items-center justify-content-center fw-bold fs-3 text-navy">
+            {{ pass_data.student_name[:2] }}
+          </div>
+        {% endif %}
+        <h5 class="fw-bold mt-2 mb-0 text-navy">{{ pass_data.student_name }}</h5>
+        <div class="text-muted small">
+          <strong>{{ pass_data.roll_number }}</strong> &bull; {{ pass_data.program }} ({{ pass_data.department }})
+        </div>
+        <div class="small text-secondary mt-1">
+          <i class="bi bi-building me-1"></i>{{ pass_data.hostel }} &bull; Room {{ pass_data.room }}
+        </div>
+      </div>
+
+      <!-- Verification QR Code Box -->
+      <div class="text-center px-4 py-2">
+        {% if pass_data.status in ('APPROVED', 'OUTSIDE', 'COMPLETED') and pass_data.qr_code_image %}
+          <div class="pass-qr-box shadow-sm">
+            <img src="{{ pass_data.qr_code_image }}" alt="Verification QR Code">
+            <div class="small text-muted mt-2 fw-semibold">
+              <i class="bi bi-shield-lock text-success me-1"></i> Official Gate Verification QR
+            </div>
+            <div class="badge bg-light text-dark border small mt-1 font-monospace">
+              Pass ID: {{ pass_data.pass_code }}
+            </div>
+          </div>
+          <p class="text-muted small mb-0">Present this QR code to the Security Guard at any campus gate.</p>
+        {% elif pass_data.status == 'PENDING' %}
+          <div class="p-4 bg-warning-subtle rounded-3 my-3 border border-warning text-center">
+            <i class="bi bi-hourglass-split fs-1 text-warning d-block mb-2"></i>
+            <h6 class="fw-bold text-dark mb-1">Awaiting Warden Approval</h6>
+            <p class="small text-secondary mb-0">The verification QR pass will be automatically generated upon warden approval.</p>
+          </div>
+        {% elif pass_data.status == 'REJECTED' %}
+          <div class="p-4 bg-danger-subtle rounded-3 my-3 border border-danger text-center">
+            <i class="bi bi-x-circle fs-1 text-danger d-block mb-2"></i>
+            <h6 class="fw-bold text-danger mb-1">Application Declined</h6>
+            <p class="small text-secondary mb-0"><strong>Reason:</strong> {{ pass_data.rejection_reason or 'Hostel policy limits.' }}</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Status Banner -->
+      <div class="px-4 py-2 text-center">
+        <span class="badge-status {{ pass_data.status.lower() }} fs-6 px-3 py-2">
+          {% if pass_data.status == 'APPROVED' %}
+            <i class="bi bi-check-circle-fill"></i> APPROVED &bull; READY FOR EXIT
+          {% elif pass_data.status == 'OUTSIDE' %}
+            <i class="bi bi-door-open-fill"></i> CURRENTLY OUTSIDE CAMPUS
+          {% elif pass_data.status == 'COMPLETED' %}
+            <i class="bi bi-check-all"></i> COMPLETED &bull; RETURNED TO CAMPUS
+          {% elif pass_data.status == 'PENDING' %}
+            <i class="bi bi-clock-history"></i> PENDING WARDEN REVIEW
+          {% elif pass_data.status == 'REJECTED' %}
+            <i class="bi bi-x-circle"></i> REJECTED
+          {% endif %}
+        </span>
+      </div>
+
+      <!-- Schedule & Details List -->
+      <div class="card-body p-4 pt-2">
+        <div class="bg-light p-3 rounded-3 border mb-3">
+          <div class="row g-2 text-center">
+            <div class="col-6 border-end">
+              <span class="small text-muted d-block text-uppercase fw-semibold" style="font-size: 0.72rem;">Planned Exit</span>
+              <span class="fw-bold text-navy">{{ pass_data.planned_exit_datetime | time_only }}</span>
+              <div class="small text-muted" style="font-size: 0.75rem;">{{ pass_data.departure_date }}</div>
+            </div>
+            <div class="col-6">
+              <span class="small text-muted d-block text-uppercase fw-semibold" style="font-size: 0.72rem;">Expected Return</span>
+              <span class="fw-bold text-navy">{{ pass_data.expected_return_datetime | time_only }}</span>
+              <div class="small text-muted" style="font-size: 0.75rem;">Curfew: 10:00 PM</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="small mb-3">
+          <div class="d-flex justify-content-between py-1 border-bottom">
+            <span class="text-muted">Destination:</span>
+            <span class="fw-semibold text-dark text-end">{{ pass_data.destination }}</span>
+          </div>
+          <div class="d-flex justify-content-between py-1 border-bottom">
+            <span class="text-muted">Purpose:</span>
+            <span class="fw-semibold text-dark text-end">{{ pass_data.purpose }}</span>
+          </div>
+          {% if pass_data.warden_name %}
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="text-muted">Approved By:</span>
+              <span class="fw-semibold text-success text-end">{{ pass_data.warden_name }}</span>
+            </div>
+          {% endif %}
+          {% if pass_data.approved_at %}
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="text-muted">Approval Timestamp:</span>
+              <span class="text-end">{{ pass_data.approved_at | ist_date }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Recorded Gate Movements Timeline -->
+        {% if pass_data.logs %}
+          <div class="border rounded-3 p-3 bg-white mb-2">
+            <h6 class="fw-bold text-navy mb-2 small text-uppercase">
+              <i class="bi bi-clock-history me-1"></i> Recorded Gate Verifications
+            </h6>
+            <div class="timeline small">
+              {% for log in pass_data.logs %}
+                <div class="d-flex align-items-center justify-content-between py-1 border-bottom">
+                  <div>
+                    {% if log.movement_type == 'EXIT' %}
+                      <span class="badge bg-danger-subtle text-danger fw-bold me-1">DEPARTURE</span>
+                    {% else %}
+                      <span class="badge bg-success-subtle text-success fw-bold me-1">ARRIVAL</span>
+                    {% endif %}
+                    <strong>{{ log.gate_name }}</strong> &bull; Guard: {{ log.guard_name }}
+                  </div>
+                  <div class="text-muted font-monospace">{{ log.timestamp | time_only }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if pass_data.is_late %}
+          <div class="alert alert-danger py-2 small mb-0 mt-2">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            <strong>Late Return Flagged:</strong> {{ pass_data.minutes_late }} minutes past deadline ({{ pass_data.late_reason }}). Recorded on hostel administrative record.
+          </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Card Footer -->
+      <div class="card-footer bg-light border-top text-center py-2 text-muted" style="font-size: 0.72rem;">
+        Hostel Outpass System &bull; Verified via Cryptographic QR Token
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

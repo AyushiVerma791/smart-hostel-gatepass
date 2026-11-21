@@ -1,0 +1,303 @@
+/* ==========================================================================
+   GatePass — Smart Girls' Hostel Outpass Management System
+   Modern SaaS & Administrative Theme (Navy Blue & Pure White)
+   ========================================================================== */
+
+:root {
+  --primary-navy: #0d2b45;
+  --secondary-navy: #173f5f;
+  --accent-blue: #20639b;
+  --light-blue: #ebf3fa;
+  --bg-slate: #f8fafc;
+  --card-bg: #ffffff;
+  --text-primary: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  
+  --status-pending: #d97706;
+  --status-pending-bg: #fef3c7;
+  --status-approved: #16a34a;
+  --status-approved-bg: #dcfce7;
+  --status-outside: #7c3aed;
+  --status-outside-bg: #ede9fe;
+  --status-completed: #475569;
+  --status-completed-bg: #f1f5f9;
+  --status-rejected: #dc2626;
+  --status-rejected-bg: #fee2e2;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-slate);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Navbar */
+.navbar-gatepass {
+  background-color: var(--primary-navy);
+  box-shadow: 0 2px 8px rgba(13, 43, 69, 0.2);
+  padding: 0.75rem 1.25rem;
+}
+
+.navbar-gatepass .navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: #ffffff !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-gatepass .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  font-size: 0.925rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.navbar-gatepass .nav-link:hover,
+.navbar-gatepass .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Custom Cards */
+.card-gp {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.85rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-gp:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-gp-header {
+  padding: 1.15rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: #ffffff;
+  border-top-left-radius: 0.85rem;
+  border-top-right-radius: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-gp-body {
+  padding: 1.25rem;
+}
+
+/* Metric KPI Cards */
+.kpi-card {
+  padding: 1.25rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+/* Buttons */
+.btn-navy {
+  background-color: var(--primary-navy);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  padding: 0.55rem 1.25rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-navy:hover {
+  background-color: var(--secondary-navy);
+  color: #ffffff;
+}
+
+.btn-accent {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  padding: 0.55rem 1.25rem;
+}
+
+.btn-accent:hover {
+  background-color: #174d7a;
+  color: #ffffff;
+}
+
+/* Badges for Outpass Status */
+.badge-status {
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.785rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-status.pending {
+  background-color: var(--status-pending-bg);
+  color: var(--status-pending);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+
+.badge-status.approved {
+  background-color: var(--status-approved-bg);
+  color: var(--status-approved);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+}
+
+.badge-status.outside {
+  background-color: var(--status-outside-bg);
+  color: var(--status-outside);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.badge-status.completed {
+  background-color: var(--status-completed-bg);
+  color: var(--status-completed);
+  border: 1px solid rgba(71, 85, 105, 0.25);
+}
+
+.badge-status.rejected {
+  background-color: var(--status-rejected-bg);
+  color: var(--status-rejected);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+/* Digital Pass Preview Card */
+.digital-pass-card {
+  max-width: 480px;
+  margin: 0 auto;
+  border: 2px solid var(--primary-navy);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: var(--shadow-lg);
+}
+
+.pass-header {
+  background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
+  color: #ffffff;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.pass-photo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: var(--shadow-md);
+  margin-top: -45px;
+  background: #ffffff;
+  object-fit: cover;
+}
+
+.pass-qr-box {
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: inline-block;
+  margin: 1rem 0;
+}
+
+.pass-qr-box img {
+  width: 190px;
+  height: 190px;
+  display: block;
+}
+
+/* Tables */
+.table-gp {
+  margin-bottom: 0;
+}
+
+.table-gp th {
+  background-color: #f8fafc;
+  color: var(--text-muted);
+  font-size: 0.775rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-top: none;
+  padding: 0.85rem 1rem;
+}
+
+.table-gp td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Scanner viewport */
+#qr-reader {
+  width: 100% !important;
+  border: none !important;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+#qr-reader__scan_region {
+  background: #000;
+}
+
+/* Footer */
+footer {
+  background-color: #ffffff;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 1.25rem 0;
+  margin-top: auto;
+}
+
+/* Print Styles */
+@media print {
+  .no-print, nav, footer, .btn {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+  }
+  .digital-pass-card {
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    margin: 0 auto;
+    page-break-inside: avoid;
+  }
+}
